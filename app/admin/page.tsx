@@ -14,7 +14,6 @@ import {
   Cell,
 } from "recharts";
 import {
-  TrendingUp,
   Users,
   Wrench,
   ArrowUpRight,

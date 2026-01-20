@@ -4,14 +4,12 @@ import React, { useEffect, useState } from "react";
 import {
   Download,
   Filter,
-  Calendar,
   ArrowUpRight,
   TrendingUp,
   History,
   CheckCircle2,
   Clock,
   Loader2,
-  Printer,
 } from "lucide-react";
 import { useTheme } from "../../context/ThemeContext";
 

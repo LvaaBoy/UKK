@@ -4,7 +4,6 @@ import {
   Plus,
   Search,
   Filter,
-  MoreVertical,
   Wrench,
   Hammer,
   AlertCircle,
