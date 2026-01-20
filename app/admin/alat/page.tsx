@@ -18,8 +18,18 @@ import {
 import { useTheme } from "../../context/ThemeContext";
 
 export default function AlatPage() {
-  const [alat, setAlat] = useState<any[]>([]);
-  const [categories, setCategories] = useState<any[]>([]);
+  const [alat, setAlat] = useState<Array<{
+    id: number;
+    nama_alat: string;
+    kategori_id: number;
+    nama_kategori: string;
+    stok: number;
+    deskripsi: string;
+  }>>([]);
+  const [categories, setCategories] = useState<Array<{
+    id: number;
+    nama_kategori: string;
+  }>>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -52,7 +62,14 @@ export default function AlatPage() {
     fetchData();
   }, []);
 
-  const handleOpenModal = (item: any = null) => {
+  const handleOpenModal = (item: {
+    id: number;
+    nama_alat: string;
+    kategori_id: number;
+    nama_kategori: string;
+    stok: number;
+    deskripsi: string;
+  } | null = null) => {
     if (item) {
       setFormData({
         id: item.id,

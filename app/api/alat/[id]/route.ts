@@ -24,7 +24,7 @@ export async function DELETE(
     try {
         await db.query("DELETE FROM alat WHERE id=$1", [id]);
         return NextResponse.json({ message: "Alat berhasil dihapus" });
-    } catch (error) {
+    } catch {
         return NextResponse.json({ error: "Gagal menghapus alat. Mungkin masih terkait dengan data peminjaman." }, { status: 500 });
     }
 }

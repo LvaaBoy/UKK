@@ -57,7 +57,7 @@ export async function GET() {
       })),
       recommendedTools: toolsRes.rows
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("User Stats API Error:", error);
     return NextResponse.json({ error: "Gagal mengambil data user" }, { status: 500 });
   }

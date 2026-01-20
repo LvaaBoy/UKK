@@ -25,7 +25,7 @@ export async function DELETE(
         // Basic protection: don't delete if related to peminjaman (handled by DB constraints usually)
         await db.query("DELETE FROM users WHERE id=$1", [id]);
         return NextResponse.json({ message: "User berhasil dihapus" });
-    } catch (error) {
+    } catch {
         return NextResponse.json({ error: "Gagal menghapus user. Mungkin masih terkait dengan data transaksi." }, { status: 500 });
     }
 }

@@ -18,7 +18,13 @@ import {
 import { useTheme } from "../../context/ThemeContext";
 
 export default function UsersPage() {
-    const [users, setUsers] = useState<any[]>([]);
+    const [users, setUsers] = useState<Array<{
+        id: number;
+        nama: string;
+        username: string;
+        role: string;
+        created_at: string;
+    }>>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
     const [showModal, setShowModal] = useState(false);
@@ -49,7 +55,13 @@ export default function UsersPage() {
         fetchUsers();
     }, []);
 
-    const handleOpenModal = (user: any = null) => {
+    const handleOpenModal = (user: {
+        id: number;
+        nama: string;
+        username: string;
+        role: string;
+        created_at: string;
+    } | null = null) => {
         if (user) {
             setFormData({
                 id: user.id,

@@ -68,7 +68,13 @@ function AlatList() {
         }
     }, [searchParams, alat]);
 
-    const handleOpenBorrow = (tool: any) => {
+    const handleOpenBorrow = (tool: {
+        id: number;
+        nama_alat: string;
+        nama_kategori: string;
+        stok: number;
+        deskripsi: string;
+    }) => {
         setSelectedTool(tool);
         setShowModal(true);
     };
