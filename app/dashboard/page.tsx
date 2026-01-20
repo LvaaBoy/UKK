@@ -2,14 +2,11 @@
 
 import { useEffect, useState } from "react";
 import {
-  Wrench,
   Clock,
   CheckCircle2,
-  ArrowUpRight,
   ChevronRight,
   Search,
   Box,
-  LayoutGrid,
   AlertCircle,
   Loader2,
   Sparkles,
@@ -21,7 +18,12 @@ import Link from "next/link";
 export default function UserDashboard() {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<{
+    stats: { pendingRequests: string; activeLoans: string; totalLoans: string };
+    recentActivities: Array<{ id: string; item: string; date: string; status: string }>;
+    recommendedTools: Array<{ id: number; name: string; quantity: number }>;
+    error?: string;
+  } | null>(null);
 
   useEffect(() => {
     fetch("/api/user/stats")
@@ -33,7 +35,12 @@ export default function UserDashboard() {
       })
       .catch(err => {
         console.error("Failed to fetch user stats", err);
-        setData({ error: err.message });
+        setData({
+          error: err instanceof Error ? err.message : "Unknown error",
+          stats: { pendingRequests: "0", activeLoans: "0", totalLoans: "0" },
+          recentActivities: [],
+          recommendedTools: []
+        });
         setLoading(false);
       });
   }, []);
@@ -134,7 +141,7 @@ export default function UserDashboard() {
           </div>
 
           <div className="flex-1 space-y-4">
-            {data.recentActivities.map((row: any, idx: number) => (
+            {data.recentActivities.map((row, idx: number) => (
               <div key={idx} className="flex items-center justify-between p-5 bg-slate-50/50 hover:bg-white rounded-3xl border border-transparent hover:border-blue-50 transition-all group shadow-sm hover:shadow-md">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-blue-500 font-black border border-slate-100 shadow-sm group-hover:scale-110 transition-transform">
@@ -169,7 +176,7 @@ export default function UserDashboard() {
           </div>
 
           <div className="space-y-4 relative z-10">
-            {data.recommendedTools.map((tool: any) => (
+            {data.recommendedTools.map((tool) => (
               <Link
                 key={tool.id}
                 href={`/dashboard/alat?borrow=${tool.id}`}
@@ -192,7 +199,13 @@ export default function UserDashboard() {
   );
 }
 
-function DashboardStat({ title, value, icon, color, href }: any) {
+function DashboardStat({ title, value, icon, color, href }: {
+  title: string;
+  value: string;
+  icon: React.ReactNode;
+  color: string;
+  href: string;
+}) {
   const isBlue = color === "blue";
   return (
     <Link href={href} className={`p-8 rounded-[40px] border shadow-xl shadow-blue-500/5 bg-white relative overflow-hidden group hover:-translate-y-1 transition-all duration-500 flex flex-col justify-between

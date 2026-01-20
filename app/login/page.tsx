@@ -158,7 +158,7 @@ export default function LoginPage() {
               </h3>
 
               <div className="relative">
-                <span className="absolute -top-6 -left-4 text-8xl text-white/10 font-serif leading-none">"</span>
+                <span className="absolute -top-6 -left-4 text-8xl text-white/10 font-serif leading-none">&ldquo;</span>
                 <p className="text-xl text-white/90 font-medium italic leading-relaxed relative z-10">
                   &ldquo;Lending tools here is incredibly smooth. Search, click, and pick up. It&apos;s transformed how I manage my projects.&rdquo;
                 </p>

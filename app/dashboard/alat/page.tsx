@@ -8,7 +8,6 @@ import {
     Wrench,
     Hammer,
     AlertCircle,
-    CheckCircle2,
     Package,
     Loader2,
     Settings,
@@ -21,11 +20,23 @@ import { useTheme } from "../../context/ThemeContext";
 function AlatList() {
     const { theme } = useTheme();
     const searchParams = useSearchParams();
-    const [alat, setAlat] = useState<any[]>([]);
+    const [alat, setAlat] = useState<Array<{
+        id: number;
+        nama_alat: string;
+        nama_kategori: string;
+        stok: number;
+        deskripsi: string;
+    }>>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
     const [showModal, setShowModal] = useState(false);
-    const [selectedTool, setSelectedTool] = useState<any>(null);
+    const [selectedTool, setSelectedTool] = useState<{
+        id: number;
+        nama_alat: string;
+        nama_kategori: string;
+        stok: number;
+        deskripsi: string;
+    } | null>(null);
     const [tanggalKembali, setTanggalKembali] = useState("");
     const [submitting, setSubmitting] = useState(false);
 
@@ -64,6 +75,7 @@ function AlatList() {
 
     const handleBorrow = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!selectedTool) return;
         setSubmitting(true);
         try {
             const res = await fetch("/api/peminjaman", {
