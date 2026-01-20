@@ -6,10 +6,6 @@ import {
   CheckCircle2,
   Clock,
   AlertTriangle,
-  ArrowUpRight,
-  ArrowDownRight,
-  ChevronRight,
-  MoreVertical,
   Check,
   X,
   PackageCheck,
@@ -18,10 +14,7 @@ import {
 } from "lucide-react";
 import { useTranslation } from "../context/LanguageContext";
 import {
-  BarChart,
-  Bar,
   XAxis,
-  YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
@@ -32,7 +25,13 @@ import {
 export default function PetugasDashboard() {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<{
+    stats: { pendingRequests: string; activeLoans: string; toolsOut: string };
+    incomingRequests: Array<{ id: string; user: string; item: string }>;
+    charts: { activity: Array<{ day: string; count: number }> };
+    activeTracking: Array<{ id: string; user: string; item: string; status: string; date: string }>;
+    error?: string;
+  } | null>(null);
 
   useEffect(() => {
     fetch("/api/petugas/stats")
@@ -43,7 +42,13 @@ export default function PetugasDashboard() {
       })
       .catch(err => {
         console.error(err);
-        setData({ error: "Gagal menghubungkan ke server" });
+        setData({
+          error: "Gagal menghubungkan ke server",
+          stats: { pendingRequests: "0", activeLoans: "0", toolsOut: "0" },
+          incomingRequests: [],
+          charts: { activity: [] },
+          activeTracking: []
+        });
         setLoading(false);
       });
   }, []);
@@ -143,7 +148,7 @@ export default function PetugasDashboard() {
           </div>
 
           <div className="flex-1 space-y-4">
-            {data.incomingRequests.map((row: any) => (
+            {data.incomingRequests.map((row) => (
               <div key={row.id} className="flex items-center justify-between p-5 bg-slate-50/50 hover:bg-blue-50/30 rounded-3xl border border-transparent hover:border-blue-100 transition-all group">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-slate-300 font-black border border-slate-100 group-hover:border-blue-200">
@@ -208,7 +213,7 @@ export default function PetugasDashboard() {
 
           <div className="space-y-4">
             <h4 className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-4">{t('active_operations')}</h4>
-            {data.activeTracking.map((item: any) => (
+            {data.activeTracking.map((item) => (
               <div key={item.id} className="p-4 bg-slate-50/50 hover:bg-white rounded-3xl border border-transparent hover:border-blue-50 transition-all group relative overflow-hidden">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -241,7 +246,12 @@ export default function PetugasDashboard() {
   );
 }
 
-function PetugasStat({ title, value, icon, color }: any) {
+function PetugasStat({ title, value, icon, color }: {
+  title: string;
+  value: string;
+  icon: React.ReactNode;
+  color: string;
+}) {
   const isBlue = color === "blue";
   return (
     <div className={`p-8 rounded-[40px] border shadow-xl shadow-blue-500/5 bg-white relative overflow-hidden group hover:-translate-y-1 transition-all duration-500

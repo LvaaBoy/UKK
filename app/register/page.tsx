@@ -4,10 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
     ArrowRight,
-    ArrowLeft,
-    Star,
-    Github,
-    Facebook,
     Wrench,
     User,
     AtSign,
@@ -190,7 +186,7 @@ export default function RegisterPage() {
                             <div className="relative">
                                 <span className="absolute -top-6 -left-4 text-8xl text-white/10 font-serif leading-none">"</span>
                                 <p className="text-xl text-white/90 font-medium italic leading-relaxed relative z-10">
-                                    "The inventory transparency here is revolutionary. I can plan my entire lab workflow from home."
+                                    &ldquo;The inventory transparency here is revolutionary. I can plan my entire lab workflow from home.&rdquo;
                                 </p>
                             </div>
 
