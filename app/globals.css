@@ -1,37 +1,41 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand-green: #00df82;
-  --color-brand-dark: #050807;
-  --color-brand-card: #0c1411;
+  --color-brand-blue: #3b82f6;
+  --color-brand-pink: #ec4899;
+  --color-brand-sky: #f0f9ff;
+  --color-brand-border: #e2e8f0;
 }
 
 :root {
-  --background: #f8fafc;
+  --background: #ffffff;
   --foreground: #0f172a;
-  --card-bg: #ffffff;
-  --card-border: #f1f5f9;
+  --card-bg: #f8fafc;
+  --card-border: #e2e8f0;
   --border-color: #e2e8f0;
-  --primary: #00df82;
-  --primary-foreground: #050505;
+  --primary: #3b82f6;
+  --primary-foreground: #ffffff;
   --muted: #64748b;
   --muted-foreground: #94a3b8;
+  --accent: #ec4899;
+  --accent-foreground: #ffffff;
 }
 
-.dark {
-  --background: #0a110e;
-  --foreground: #f8fafc;
-  --card-bg: #121e1a;
-  --card-border: #1e352f;
-  --border-color: #1e352f;
-  --primary: #00df82;
-  --primary-foreground: #050505;
-  --muted: #94a3b8;
-  --muted-foreground: #64748b;
-}
-
+/* Force light theme always */
 body {
-  background: var(--background);
+  background: linear-gradient(135deg, #f0f9ff 0%, #ffffff 100%);
+  background-attachment: fixed;
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.pink-glow {
+  box-shadow: 0 0 20px rgba(236, 72, 153, 0.1);
 }

@@ -15,6 +15,7 @@ import {
 import { useTheme } from "../../context/ThemeContext";
 
 export default function LaporanPage() {
+    const { theme } = useTheme();
     const [data, setData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [printDate] = useState(new Date().toLocaleDateString('id-ID', {
@@ -48,7 +49,6 @@ export default function LaporanPage() {
         );
     }
 
-    const { theme } = useTheme();
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500 max-w-7xl mx-auto pb-20">
@@ -124,7 +124,8 @@ export default function LaporanPage() {
                                     </td>
                                     <td className="py-5 px-4 text-center">
                                         <span className={`px-3 py-1 rounded-full text-[10px] font-black tracking-wider inline-block min-w-[90px] border ${row.status === 'KEMBALI' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
-                                            row.status === 'DIPINJAM' ? 'bg-blue-50 text-blue-600 border-blue-100' : 'bg-red-50 text-red-600 border-red-100'
+                                            row.status === 'DISETUJUI' || row.status === 'DIPINJAM' ? 'bg-blue-50 text-blue-600 border-blue-100' :
+                                                row.status === 'PENDING' ? 'bg-orange-50 text-orange-600 border-orange-100' : 'bg-red-50 text-red-600 border-red-100'
                                             }`}>
                                             {row.status}
                                         </span>

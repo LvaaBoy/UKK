@@ -135,12 +135,12 @@ function AlatList() {
                     <div className="w-10 h-10 border-4 border-brand-green border-t-transparent rounded-full animate-spin"></div>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-8">
                     {filteredAlat.map((item) => (
-                        <div key={item.id} className={`group rounded-[40px] border p-8 shadow-sm hover:shadow-2xl hover:shadow-emerald-500/5 transition-all duration-500 relative flex flex-col
+                        <div key={item.id} className={`group rounded-[32px] md:rounded-[40px] border p-6 md:p-8 shadow-sm hover:shadow-2xl hover:shadow-emerald-500/5 transition-all duration-500 relative flex flex-col
               ${theme === 'dark' ? 'bg-brand-card border-white/5' : 'bg-white border-slate-100'}`}>
 
-                            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-8 transition-all duration-500 group-hover:scale-110 shadow-inner
+                            <div className={`w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center mb-6 md:mb-8 transition-all duration-500 group-hover:scale-110 shadow-inner
                 ${theme === 'dark' ? 'bg-white/5 text-slate-400 group-hover:text-brand-green' : 'bg-slate-50 text-slate-400 group-hover:text-brand-green'}`}>
                                 {item.nama_kategori.toLowerCase().includes('bor') ? <Settings size={28} /> :
                                     item.nama_kategori.toLowerCase().includes('perkakas') ? <Hammer size={28} /> : <Wrench size={28} />}
@@ -148,34 +148,34 @@ function AlatList() {
 
                             <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-2">
-                                    <span className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg
+                                    <span className={`text-[9px] md:text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg
                     ${theme === 'dark' ? 'bg-brand-green/10 text-brand-green' : 'bg-emerald-50 text-emerald-600'}`}>
                                         {item.nama_kategori}
                                     </span>
                                 </div>
-                                <h3 className={`font-black text-xl mb-4 group-hover:text-brand-green transition-colors ${theme === 'dark' ? 'text-white' : 'text-slate-800'}`}>
+                                <h3 className={`font-black text-lg md:text-xl mb-3 md:mb-4 group-hover:text-brand-green transition-colors ${theme === 'dark' ? 'text-white' : 'text-slate-800'}`}>
                                     {item.nama_alat}
                                 </h3>
-                                <p className="text-sm text-slate-400 line-clamp-2 mb-8 font-medium">
+                                <p className="text-xs md:text-sm text-slate-400 line-clamp-2 mb-6 md:mb-8 font-medium">
                                     {item.deskripsi || "Alat laboratorium berkualitas tinggi untuk mendukung kegiatan praktikum dan penelitian Anda."}
                                 </p>
                             </div>
 
                             <div className={`flex items-center justify-between pt-6 border-t font-bold ${theme === 'dark' ? 'border-white/5' : 'border-slate-50'}`}>
                                 <div className="flex flex-col">
-                                    <span className="text-[10px] text-slate-400 uppercase tracking-widest mb-1">Stok Tersedia</span>
-                                    <span className={`text-xl ${item.stok < 3 ? "text-red-500" : (theme === 'dark' ? "text-white" : "text-slate-800")}`}>{item.stok}</span>
+                                    <span className="text-[9px] text-slate-400 uppercase tracking-widest mb-1">Stok</span>
+                                    <span className={`text-lg md:text-xl ${item.stok < 3 ? "text-red-500" : (theme === 'dark' ? "text-white" : "text-slate-800")}`}>{item.stok}</span>
                                 </div>
 
                                 <button
                                     onClick={() => handleOpenBorrow(item)}
                                     disabled={item.stok === 0}
-                                    className={`px-5 py-2.5 rounded-2xl font-black text-xs transition-all flex items-center gap-2
+                                    className={`px-4 md:px-5 py-2 md:py-2.5 rounded-xl md:rounded-2xl font-black text-[10px] md:text-xs transition-all flex items-center gap-2
                     ${item.stok > 0
                                             ? "bg-brand-green text-black hover:scale-105 active:scale-95 shadow-lg shadow-emerald-500/20"
                                             : "bg-slate-100 text-slate-400 cursor-not-allowed opacity-50"}`}
                                 >
-                                    {item.stok > 0 ? "Pinjam Alat" : "Stok Habis"}
+                                    {item.stok > 0 ? "Pinjam Alat" : "Habis"}
                                 </button>
                             </div>
                         </div>

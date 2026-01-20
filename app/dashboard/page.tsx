@@ -10,13 +10,16 @@ import {
   Search,
   Box,
   LayoutGrid,
-  AlertCircle
+  AlertCircle,
+  Loader2,
+  Sparkles,
+  ArrowRight
 } from "lucide-react";
-import { useTheme } from "../context/ThemeContext";
+import { useTranslation } from "../context/LanguageContext";
 import Link from "next/link";
 
 export default function UserDashboard() {
-  const { theme } = useTheme();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<any>(null);
 
@@ -37,24 +40,26 @@ export default function UserDashboard() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[400px] items-center justify-center">
-        <div className="w-12 h-12 border-4 border-brand-green border-t-transparent rounded-full animate-spin"></div>
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+        <Loader2 className="w-12 h-12 text-blue-500 animate-spin" />
+        <p className="text-slate-400 font-bold animate-pulse">{t('preparing_workspace')}</p>
       </div>
     );
   }
 
   if (!data || data.error) {
     return (
-      <div className="p-20 text-center">
-        <div className="bg-red-500/10 text-red-500 p-8 rounded-[32px] border border-red-500/20 max-w-md mx-auto">
-          <AlertCircle size={48} className="mx-auto mb-4" />
-          <h2 className="text-xl font-bold mb-2">Terjadi Kesalahan</h2>
-          <p className="text-sm opacity-80 mb-6">{data?.error || "Gagal memuat data dashboard."}</p>
+      <div className="p-20 text-center animate-in zoom-in duration-500">
+        <div className="bg-white p-8 rounded-[40px] border border-pink-100 shadow-xl shadow-pink-500/5 max-w-md mx-auto relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-1 bg-pink-500" />
+          <AlertCircle size={48} className="mx-auto mb-4 text-pink-500" />
+          <h2 className="text-2xl font-black text-blue-900 mb-2">Oops! Something went wrong</h2>
+          <p className="text-sm text-slate-500 mb-8 font-medium">{data?.error || t('error_loading_dashboard')}</p>
           <button
             onClick={() => window.location.reload()}
-            className="bg-red-500 text-white px-6 py-2 rounded-xl font-bold hover:bg-red-600 transition-colors"
+            className="w-full bg-blue-500 text-white px-6 py-4 rounded-2xl font-black hover:bg-blue-600 transition-all shadow-lg shadow-blue-200 active:scale-95"
           >
-            Coba Lagi
+            {t('try_again')}
           </button>
         </div>
       </div>
@@ -62,134 +67,123 @@ export default function UserDashboard() {
   }
 
   return (
-    <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-10">
-      {/* Header Section */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-3xl md:text-4xl font-black tracking-tight">
-            Dashboard <span className="text-brand-green">Peminjam</span>
-          </h1>
-          <p className="text-slate-400 mt-2 font-medium">Kelola peminjaman alat Anda dengan mudah.</p>
+    <div className="space-y-10 animate-in fade-in slide-in-from-bottom-6 duration-1000">
+      {/* Hero Welcome Section */}
+      <div className="bg-white rounded-[40px] border border-blue-100 p-8 md:p-12 shadow-xl shadow-blue-500/5 relative overflow-hidden group">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-linear-to-br from-blue-400 to-pink-400 opacity-5 -mr-20 -mt-20 rounded-full group-hover:scale-110 transition-transform duration-700" />
+        <div className="absolute bottom-0 left-0 w-32 h-32 bg-pink-500 opacity-[0.02] -ml-16 -mb-16 rounded-full" />
+
+        <div className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-8 text-center md:text-left">
+          <div className="space-y-4">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-50 text-blue-500 rounded-full text-xs font-black uppercase tracking-widest border border-blue-100">
+              <Sparkles size={14} /> {t('welcome')}
+            </div>
+            <h1 className="text-4xl md:text-5xl font-black text-blue-900 leading-tight">
+              {t('lend_tools_desc')} <br /> <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-500 to-pink-500">confidence.</span>
+            </h1>
+            <p className="text-slate-500 font-medium max-w-md">{t('modern_toolkit_desc')}</p>
+          </div>
+          <Link
+            href="/dashboard/alat"
+            className="group relative bg-blue-900 text-white px-8 py-5 rounded-[24px] font-black flex items-center gap-3 hover:bg-black transition-all shadow-2xl shadow-blue-900/20 active:scale-95 overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-linear-to-r from-blue-400 to-pink-400 opacity-0 group-hover:opacity-20 transition-opacity" />
+            <Search size={20} />
+            <span>{t('explore_inventory')}</span>
+            <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+          </Link>
         </div>
-        <Link
-          href="/dashboard/alat"
-          className="bg-brand-green text-black px-6 py-3 rounded-2xl font-bold flex items-center gap-2 hover:scale-105 transition-all shadow-lg shadow-emerald-500/20 active:scale-95 text-sm"
-        >
-          <Search size={18} />
-          Cari & Pinjam Alat
-        </Link>
       </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <StatCard
-          title="Pinjaman Aktif"
+        <DashboardStat
+          title={t('active_loans')}
           value={data.stats.activeLoans}
-          icon={<CheckCircle2 size={20} />}
-          variant="primary"
-          link="/dashboard/peminjaman"
+          icon={<CheckCircle2 size={22} />}
+          color="blue"
+          href="/dashboard/peminjaman"
         />
-        <StatCard
-          title="Menunggu Verifikasi"
+        <DashboardStat
+          title={t('pending')}
           value={data.stats.pendingRequests}
-          icon={<Clock size={20} />}
-          variant="outline"
-          link="/dashboard/peminjaman"
+          icon={<Clock size={22} />}
+          color="pink"
+          href="/dashboard/peminjaman"
         />
-        <StatCard
-          title="Total Peminjaman"
+        <DashboardStat
+          title={t('total_loans')}
           value={data.stats.totalLoans}
-          icon={<Box size={20} />}
-          variant="outline"
-          link="/dashboard/peminjaman"
+          icon={<Box size={22} />}
+          color="blue"
+          href="/dashboard/peminjaman"
         />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Recent Activity Table */}
-        <div className={`lg:col-span-2 p-8 rounded-[40px] border shadow-sm ${theme === 'dark' ? 'bg-brand-card border-white/5 shadow-black/50' : 'bg-white border-slate-100 shadow-slate-200/50'}`}>
+        {/* Recent Activity */}
+        <div className="lg:col-span-2 bg-white rounded-[40px] border border-blue-100 shadow-xl shadow-blue-500/5 p-8 flex flex-col">
           <div className="flex justify-between items-center mb-10">
-            <h3 className="font-bold text-xl flex items-center gap-3">
-              <span className="w-10 h-10 bg-brand-green/10 text-brand-green rounded-xl flex items-center justify-center">
-                <Clock size={20} />
-              </span>
-              Aktivitas Terakhir
-            </h3>
-            <Link href="/dashboard/peminjaman" className="text-brand-green text-sm font-bold flex items-center gap-1 hover:underline">
-              Lihat Semua <ChevronRight size={14} />
+            <div className="space-y-1">
+              <h3 className="font-black text-2xl text-blue-900 uppercase tracking-tight">{t('recent_activity')}</h3>
+              <p className="text-xs text-slate-400 font-bold tracking-widest uppercase">{t('history')} overview</p>
+            </div>
+            <Link href="/dashboard/peminjaman" className="p-3 bg-blue-50 text-blue-500 rounded-2xl hover:bg-blue-500 hover:text-white transition-all group">
+              <ArrowRight size={20} className="group-hover:translate-x-0.5 transition-transform" />
             </Link>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead>
-                <tr className="border-b border-white/5">
-                  <th className="pb-4 pt-1 px-2 text-xs font-black text-slate-400 uppercase tracking-widest">Item</th>
-                  <th className="pb-4 pt-1 px-2 text-xs font-black text-slate-400 uppercase tracking-widest">Tanggal</th>
-                  <th className="pb-4 pt-1 px-2 text-xs font-black text-slate-400 uppercase tracking-widest">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5">
-                {data.recentActivities.map((row: any, idx: number) => (
-                  <tr key={idx} className="group hover:bg-white/5 transition-colors">
-                    <td className="py-5 px-2 font-bold">{row.item}</td>
-                    <td className="py-5 px-2 text-slate-400 text-sm">{row.date}</td>
-                    <td className="py-5 px-2">
-                      <span className={`px-3 py-1.5 rounded-full text-[10px] font-black tracking-wider ${row.status === 'KEMBALI' ? 'bg-emerald-100 text-emerald-600' :
-                        row.status === 'DISETUJUI' ? 'bg-blue-100 text-blue-600' :
-                          row.status === 'PENDING' ? 'bg-orange-100 text-orange-600' : 'bg-red-100 text-red-600'
-                        }`}>
-                        {row.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-                {data.recentActivities.length === 0 && (
-                  <tr><td colSpan={3} className="py-10 text-center text-slate-400 font-medium">Belum ada riwayat peminjaman.</td></tr>
-                )}
-              </tbody>
-            </table>
+          <div className="flex-1 space-y-4">
+            {data.recentActivities.map((row: any, idx: number) => (
+              <div key={idx} className="flex items-center justify-between p-5 bg-slate-50/50 hover:bg-white rounded-3xl border border-transparent hover:border-blue-50 transition-all group shadow-sm hover:shadow-md">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-blue-500 font-black border border-slate-100 shadow-sm group-hover:scale-110 transition-transform">
+                    {row.item.charAt(0)}
+                  </div>
+                  <div>
+                    <p className="font-bold text-blue-900 group-hover:text-blue-600 transition-colors uppercase text-sm tracking-tight">{row.item}</p>
+                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-1 italic">{row.date}</p>
+                  </div>
+                </div>
+                <span className={`px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest border ${row.status === 'KEMBALI' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
+                  row.status === 'DISETUJUI' ? 'bg-blue-50 text-blue-600 border-blue-100' :
+                    row.status === 'PENDING' ? 'bg-orange-50 text-orange-600 border-orange-100' : 'bg-red-50 text-red-600 border-red-100'
+                  }`}>
+                  {row.status}
+                </span>
+              </div>
+            ))}
+            {data.recentActivities.length === 0 && (
+              <div className="py-20 text-center text-slate-400 font-bold uppercase text-xs tracking-widest opacity-50">
+                {t('no_activity')}
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Recommended Tools */}
-        <div className="space-y-6">
-          <div className="flex justify-between items-center px-2">
-            <h3 className="font-bold text-xl flex items-center gap-3">
-              <span className="w-10 h-10 bg-orange-500/10 text-orange-500 rounded-xl flex items-center justify-center">
-                <LayoutGrid size={20} />
-              </span>
-              Tersedia Sekarang
-            </h3>
-            <Link href="/dashboard/alat" className="text-brand-green text-sm font-bold hover:underline">
-              Jelajahi
-            </Link>
+        {/* Recommended / Available */}
+        <div className="bg-white rounded-[40px] border border-blue-100 shadow-xl shadow-blue-500/5 p-8 relative overflow-hidden">
+          <div className="flex justify-between items-center mb-8 relative z-10">
+            <h3 className="font-black text-xl text-blue-900 uppercase tracking-tighter">{t('available_tools')}</h3>
+            <Link href="/dashboard/alat" className="text-[10px] font-black text-blue-500 uppercase tracking-[0.2em] hover:text-pink-500 transition-colors">{t('see_all')}</Link>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-4 relative z-10">
             {data.recommendedTools.map((tool: any) => (
-              <div
+              <Link
                 key={tool.id}
-                className={`p-6 rounded-3xl border group hover:border-brand-green transition-all shadow-sm active:scale-[0.98] ${theme === 'dark' ? 'bg-brand-card border-white/5' : 'bg-white border-slate-100'
-                  }`}
+                href={`/dashboard/alat?borrow=${tool.id}`}
+                className="block p-5 bg-slate-50/50 hover:bg-blue-50/30 rounded-3xl border border-transparent hover:border-blue-100 transition-all group"
               >
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h4 className="font-bold text-lg group-hover:text-brand-green transition-colors">{tool.name}</h4>
-                    <p className="text-xs text-slate-400 mt-1 line-clamp-1">{tool.deskripsi || "Alat berkualitas tinggi untuk praktikum."}</p>
-                  </div>
-                  <span className={`px-2 py-1 rounded-lg text-xs font-bold ${theme === 'dark' ? 'bg-white/5 text-slate-400' : 'bg-slate-50 text-slate-500'
-                    }`}>
-                    Stok: {tool.quantity}
-                  </span>
+                <div className="flex justify-between items-start mb-3">
+                  <h4 className="font-black text-blue-900 group-hover:text-blue-500 transition-colors text-sm uppercase tracking-tight">{tool.name}</h4>
+                  <div className="px-2 py-0.5 bg-white border border-slate-100 rounded-md text-[9px] font-black text-pink-500 uppercase">{t('stock')}: {tool.quantity}</div>
                 </div>
-                <Link
-                  href={`/dashboard/alat?borrow=${tool.id}`}
-                  className="w-full bg-brand-green/10 text-brand-green py-2.5 rounded-xl text-center text-sm font-black hover:bg-brand-green hover:text-black transition-all inline-block"
-                >
-                  Pinjam Alat
-                </Link>
-              </div>
+                <p className="text-[10px] text-slate-400 font-medium line-clamp-2 leading-relaxed mb-4">{tool.deskripsi || t('premium_equipment_desc')}</p>
+                <div className="flex items-center text-[10px] font-black text-blue-500 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
+                  {t('lend_now')} <ChevronRight size={12} className="ml-1" />
+                </div>
+              </Link>
             ))}
           </div>
         </div>
@@ -198,29 +192,27 @@ export default function UserDashboard() {
   );
 }
 
-function StatCard({ title, value, icon, variant = "outline", link }: any) {
-  const { theme } = useTheme();
-  const isPrimary = variant === "primary";
-
+function DashboardStat({ title, value, icon, color, href }: any) {
+  const isBlue = color === "blue";
   return (
-    <Link href={link} className={`p-6 rounded-[32px] border shadow-sm flex items-center justify-between group hover:shadow-xl transition-all duration-300
-      ${isPrimary
-        ? (theme === 'dark' ? 'bg-brand-card border-brand-green/50 text-white hover:bg-brand-card/80' : 'bg-white border-emerald-500 text-slate-800 hover:bg-slate-50')
-        : (theme === 'dark' ? 'bg-brand-card border-white/5 text-white hover:bg-brand-card/80' : 'bg-white border-slate-100 text-slate-800 hover:bg-slate-50')
-      }`}>
-      <div>
-        <div className="flex items-center gap-2 mb-4">
-          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isPrimary ? 'bg-brand-green/20 text-brand-green' : (theme === 'dark' ? 'bg-white/5 text-slate-400' : 'bg-slate-100 text-slate-400')}`}>
-            {icon}
-          </div>
-          <span className={`text-xs font-bold uppercase tracking-wider ${isPrimary ? 'text-brand-green' : 'text-slate-400'}`}>{title}</span>
+    <Link href={href} className={`p-8 rounded-[40px] border shadow-xl shadow-blue-500/5 bg-white relative overflow-hidden group hover:-translate-y-1 transition-all duration-500 flex flex-col justify-between
+      ${isBlue ? 'border-blue-100' : 'border-pink-100'}`}>
+
+      <div className={`absolute top-0 right-0 w-24 h-24 -mr-12 -mt-12 rounded-full opacity-0 group-hover:opacity-10 transition-opacity duration-700
+        ${isBlue ? 'bg-blue-500' : 'bg-pink-500'}`} />
+
+      <div className="flex items-center justify-between mb-8 relative z-10">
+        <div className={`p-3.5 rounded-2xl shadow-sm ${isBlue ? 'bg-blue-50 text-blue-500' : 'bg-pink-50 text-pink-500'}`}>
+          {icon}
         </div>
-        <h4 className={`text-3xl font-black ${isPrimary ? 'text-brand-green' : 'text-foreground'}`}>{value}</h4>
+        <div className="opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
+          <ChevronRight size={18} className={isBlue ? 'text-blue-300' : 'text-pink-300'} />
+        </div>
       </div>
-      <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-        <div className={`p-2 rounded-full ${isPrimary ? 'bg-brand-green text-black' : (theme === 'dark' ? 'bg-white/5' : 'bg-slate-100')}`}>
-          <ChevronRight size={16} />
-        </div>
+
+      <div className="relative z-10">
+        <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-2">{title}</p>
+        <h4 className="text-4xl font-black text-blue-900 group-hover:text-blue-500 transition-colors tracking-tighter">{value}</h4>
       </div>
     </Link>
   );

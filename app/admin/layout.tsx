@@ -9,23 +9,19 @@ import {
   Users,
   FileText,
   Bell,
-  Sun,
-  Moon,
-  Search,
   LogOut,
-  ChevronRight,
   Menu,
   X,
   Wrench,
-  Hammer,
-  ClipboardList,
-  CheckCircle2,
-  AlertCircle,
+  ChevronDown,
   User as UserIcon,
   Shield,
-  Palette
+  Palette,
+  ClipboardList
 } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
+import { useTranslation } from "../context/LanguageContext";
+import { Language, TranslationKeys } from "@/lib/translations";
 
 const SIDEBAR_ITEMS = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/admin" },
@@ -38,14 +34,28 @@ const SIDEBAR_ITEMS = [
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { theme, toggleTheme } = useTheme();
+  const { t, language, setLanguage } = useTranslation();
 
   const [isSidebarOpen, setSidebarOpen] = useState(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [adminName, setAdminName] = useState("User");
   const [userRole, setUserRole] = useState("");
   const [userIdentifier, setUserIdentifier] = useState("");
-  const [showNotifications, setShowNotifications] = useState(false);
+  const [showLanguageMenu, setShowLanguageMenu] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 1024) {
+        setSidebarOpen(false);
+      } else {
+        setSidebarOpen(true);
+      }
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     const role = localStorage.getItem("role");
@@ -63,59 +73,88 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const sidebarItems = SIDEBAR_ITEMS.filter(item => {
     if (userRole === "petugas") {
-      // Petugas only sees Dashboard, Products, and Categories (for operational lookups)
       return ["Dashboard", "Products", "Categories"].includes(item.label);
     }
     if (userRole === "peminjam") {
-      // Peminjam only sees Dashboard and Products (to browse)
       return ["Dashboard", "Products"].includes(item.label);
     }
-    return true; // Admin sees all
-  }).map(item => ({
-    ...item,
-    path: userRole === "petugas" && item.label === "Dashboard" ? "/petugas" :
-      userRole === "peminjam" ? (item.label === "Dashboard" ? "/dashboard" : (item.label === "Products" ? "/dashboard/alat" : item.path)) : item.path
-  }));
+    return true;
+  }).map(item => {
+    let path = item.path;
+    let labelKey = item.label.toLowerCase().replace(" ", "_") as TranslationKeys;
+
+    if (userRole === "petugas" && item.label === "Dashboard") path = "/petugas";
+    if (userRole === "peminjam") {
+      if (item.label === "Dashboard") path = "/dashboard";
+      if (item.label === "Products") path = "/dashboard/alat";
+    }
+
+    return { ...item, path, label: t(labelKey) };
+  });
 
   const logout = () => {
     localStorage.clear();
     router.push("/login");
   };
 
+  const languages: { code: Language; label: string; flag: string }[] = [
+    { code: 'en', label: 'English', flag: '🇺🇸' },
+    { code: 'id', label: 'Bahasa', flag: '🇮🇩' },
+    { code: 'es', label: 'Español', flag: '🇪🇸' },
+    { code: 'fr', label: 'Français', flag: '🇫🇷' },
+    { code: 'jp', label: '日本語', flag: '🇯🇵' },
+  ];
+
   return (
-    <div className={`flex h-screen transition-colors duration-300 ${theme === 'dark' ? 'bg-(--background) text-white' : 'bg-[#f8fafc] text-slate-800'}`}>
+    <div className="flex h-screen bg-brand-sky text-slate-800">
+      {/* Mobile Sidebar Overlay */}
+      {isMobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-blue-900/20 backdrop-blur-sm z-50 lg:hidden transition-all duration-500"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
       <aside
-        className={`${isSidebarOpen ? "w-64" : "w-20"}
-          ${theme === 'dark' ? 'bg-(--card-bg) border-(--border-color)' : 'bg-white border-slate-200'}
-          border-r flex flex-col transition-all duration-300 z-50`}
+        className={`fixed inset-y-0 left-0 lg:relative z-50 flex flex-col transition-all duration-500 border-r border-blue-100 
+          ${isMobileMenuOpen ? "translate-x-0 w-72" : "-translate-x-full lg:translate-x-0"}
+          ${isSidebarOpen ? "lg:w-64" : "lg:w-20"}
+          bg-white/80 backdrop-blur-xl
+        `}
       >
-        {/* Sidebar Header / Logo */}
-        <div className="p-6 flex items-center gap-3">
-          <div className="w-10 h-10 bg-brand-green rounded-xl flex items-center justify-center text-black shadow-lg shadow-emerald-100/10">
-            <Wrench size={20} />
+        <div className="p-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-500/20 shrink-0">
+              <Wrench size={20} />
+            </div>
+            {(isSidebarOpen || isMobileMenuOpen) && <span className="font-bold text-xl tracking-tight text-blue-900">Alat<span className="text-pink-500">Pro</span></span>}
           </div>
-          {isSidebarOpen && <span className={`font-bold text-xl tracking-tight ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>PeminjamanAlat</span>}
+          <button onClick={() => setIsMobileMenuOpen(false)} className="lg:hidden p-2 text-slate-400 hover:text-blue-500 transition-colors">
+            <X size={20} />
+          </button>
         </div>
 
-        {/* Sidebar Navigation */}
-        <nav className="flex-1 px-4 overflow-y-auto space-y-8 mt-4">
+        <nav className="flex-1 px-4 overflow-y-auto space-y-8 mt-4 scrollbar-hide">
           <div>
-            {isSidebarOpen && <p className="text-[10px] font-bold text-slate-400 tracking-widest uppercase px-2 mb-4">Main Menu</p>}
+            {(isSidebarOpen || isMobileMenuOpen) && <p className="text-[10px] font-black text-blue-300 tracking-[0.2em] uppercase px-2 mb-4">{t('management')}</p>}
             <ul className="space-y-1">
               {sidebarItems.map((item) => {
                 const isActive = pathname === item.path;
                 return (
                   <li key={item.path}>
                     <button
-                      onClick={() => router.push(item.path)}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${isActive
-                        ? "bg-brand-green/10 text-brand-green font-semibold"
-                        : theme === 'dark' ? "text-slate-400 hover:bg-white/5 hover:text-white" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                      onClick={() => {
+                        router.push(item.path);
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className={`w-full flex items-center gap-3 px-3 py-3 rounded-2xl transition-all duration-300 ${isActive
+                        ? "bg-blue-50 text-blue-600 font-bold shadow-sm"
+                        : "text-slate-500 hover:bg-blue-50/50 hover:text-blue-600"
                         }`}
                     >
-                      <item.icon size={20} className={isActive ? "text-brand-green" : "text-slate-400"} />
-                      {isSidebarOpen && <span>{item.label}</span>}
+                      <item.icon size={20} className={isActive ? "text-blue-500" : "text-slate-400"} />
+                      {(isSidebarOpen || isMobileMenuOpen) && <span className="text-sm">{item.label}</span>}
                     </button>
                   </li>
                 );
@@ -124,44 +163,34 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
 
           <div>
-            {isSidebarOpen && <p className="text-[10px] font-bold text-slate-400 tracking-widest uppercase px-2 mb-4">System</p>}
+            {(isSidebarOpen || isMobileMenuOpen) && <p className="text-[10px] font-black text-pink-300 tracking-[0.2em] uppercase px-2 mb-4">{t('settings')}</p>}
             <ul className="space-y-1">
               <li>
-                <button
-                  onClick={() => setShowSettings(true)}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${theme === 'dark' ? "text-slate-400 hover:bg-white/5 hover:text-white" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
-                    }`}
-                >
+                <button onClick={() => setShowSettings(true)} className="w-full flex items-center gap-3 px-3 py-3 rounded-2xl text-slate-500 hover:bg-pink-50 hover:text-pink-600 transition-all duration-300">
                   <SettingsIcon size={20} className="text-slate-400" />
-                  {isSidebarOpen && <span>Settings</span>}
+                  {(isSidebarOpen || isMobileMenuOpen) && <span className="text-sm">{t('settings')}</span>}
                 </button>
               </li>
               <li>
-                <button
-                  onClick={logout}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-red-500 hover:bg-red-500/10 transition-all mt-4"
-                >
+                <button onClick={logout} className="w-full flex items-center gap-3 px-3 py-3 rounded-2xl text-red-400 hover:bg-red-50 hover:text-red-600 transition-all duration-300 mt-4">
                   <LogOut size={20} />
-                  {isSidebarOpen && <span>Logout</span>}
+                  {(isSidebarOpen || isMobileMenuOpen) && <span className="text-sm font-bold">{t('logout')}</span>}
                 </button>
               </li>
             </ul>
           </div>
         </nav>
 
-        {/* Sidebar Footer / Profile */}
-        <div className={`p-4 border-t ${theme === 'dark' ? 'border-white/5' : 'border-slate-100'}`}>
-          <div className={`p-2 rounded-2xl flex items-center ${isSidebarOpen ? "gap-3" : "justify-center"} ${theme === 'dark' ? 'bg-white/5' : 'bg-slate-50'}`}>
-            <div className="w-10 h-10 rounded-xl bg-brand-green/20 flex items-center justify-center text-brand-green font-bold shrink-0 uppercase">
+        <div className="p-4 border-t border-blue-50">
+          <div className={`p-2 rounded-2xl flex items-center bg-gradient-to-r from-blue-50 to-pink-50/30 ${(isSidebarOpen || isMobileMenuOpen) ? "gap-3" : "justify-center"}`}>
+            <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-blue-600 font-bold shrink-0 uppercase border border-blue-100">
               {adminName.charAt(0)}
             </div>
-            {isSidebarOpen && (
-              <div className="overflow-hidden">
-                <p className="text-sm font-bold truncate">{adminName}</p>
-                <p className="text-[10px] text-slate-500 uppercase font-black tracking-tight tracking-wider">
-                  {userRole === 'admin' ? 'Administrator' :
-                    userRole === 'petugas' ? 'Petugas' :
-                      (userIdentifier.includes('@') ? userIdentifier : 'User')}
+            {(isSidebarOpen || isMobileMenuOpen) && (
+              <div className="overflow-hidden text-left">
+                <p className="text-sm font-bold text-blue-900 truncate">{adminName}</p>
+                <p className="text-[9px] text-slate-400 font-black tracking-widest uppercase">
+                  {userRole === 'admin' ? t('management') : userRole === 'petugas' ? 'Petugas' : 'User'}
                 </p>
               </div>
             )}
@@ -169,198 +198,85 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
       </aside>
 
-      {/* Main Content Area */}
-      <main className="flex-1 flex flex-col overflow-hidden relative">
-        {/* Topbar */}
-        <header className={`h-20 border-b flex items-center justify-between px-8 sticky top-0 z-40 transition-colors duration-300
-          ${theme === 'dark' ? 'bg-(--background) border-(--border-color)' : 'bg-white border-slate-100'}`}>
+      <main className="flex-1 flex flex-col overflow-hidden">
+        <header className="h-20 border-b border-blue-50 flex items-center justify-between px-4 lg:px-8 sticky top-0 z-40 bg-white/50 backdrop-blur-md">
           <div className="flex items-center gap-4">
             <button
-              onClick={() => setSidebarOpen(!isSidebarOpen)}
-              className={`p-2 rounded-lg transition-colors ${theme === 'dark' ? 'hover:bg-white/5 text-slate-400' : 'hover:bg-slate-100 text-slate-500'}`}
+              onClick={() => window.innerWidth < 1024 ? setIsMobileMenuOpen(true) : setSidebarOpen(!isSidebarOpen)}
+              className="p-2.5 rounded-xl hover:bg-blue-50 text-blue-400 transition-all active:scale-95"
             >
-              {isSidebarOpen ? <Menu size={20} /> : <X size={20} />}
+              <Menu size={20} />
             </button>
-            <h2 className="text-xl font-bold flex items-center gap-2">
-              Good Morning ✨
+            <h2 className="text-lg lg:text-xl font-black text-blue-900">
+              {t('welcome')} ✨
             </h2>
           </div>
 
-          <div className="flex items-center gap-4 lg:gap-6">
-            {/* Search */}
-            <div className={`hidden lg:flex items-center gap-2 px-4 py-2 rounded-xl border transition-all w-64 ${theme === 'dark' ? 'bg-white/5 border-white/10 text-slate-400 focus-within:border-brand-green/30' : 'bg-slate-100 border-transparent text-slate-500 focus-within:border-brand-green/30 focus-within:bg-white'
-              }`}>
-              <Search size={18} />
-              <input
-                type="text"
-                placeholder="Search anything..."
-                className="bg-transparent border-none outline-none text-sm w-full"
-              />
-            </div>
+          <div className="flex items-center gap-2 md:gap-4">
+            <div className="relative">
+              <button
+                onClick={() => setShowLanguageMenu(!showLanguageMenu)}
+                className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white border border-blue-100 hover:border-blue-300 transition-all font-bold text-xs"
+              >
+                <span>{languages.find(l => l.code === language)?.flag}</span>
+                <span className="hidden md:inline uppercase tracking-widest">{language}</span>
+                <ChevronDown size={14} className={`transition-transform duration-300 ${showLanguageMenu ? 'rotate-180' : ''}`} />
+              </button>
 
-            <div className={`flex items-center gap-2 pr-2 lg:pr-6 ${theme === 'dark' ? 'border-white/5' : 'border-slate-200'} border-r`}>
-              {/* Notifications */}
-              <div className="relative">
-                <button
-                  onClick={() => setShowNotifications(!showNotifications)}
-                  className={`p-2.5 rounded-full relative transition-colors ${theme === 'dark' ? 'hover:bg-white/5 text-slate-400' : 'hover:bg-slate-50 text-slate-400'}`}
-                >
-                  <Bell size={20} />
-                  <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-brand-dark"></span>
-                </button>
-
-                {showNotifications && (
-                  <div className={`absolute right-0 mt-4 w-96 rounded-3xl shadow-2xl border transition-all duration-200 overflow-hidden
-                    ${theme === 'dark' ? 'bg-(--card-bg) border-(--border-color)' : 'bg-white border-slate-100'}`}>
-                    <div className="p-6 border-b border-white/5 flex items-center justify-between">
-                      <h3 className="font-bold">Notifications</h3>
-                      <span className="text-[10px] font-bold text-brand-green bg-brand-green/10 px-2 py-0.5 rounded-md">3 NEW</span>
-                    </div>
-                    <div className="max-h-[300px] overflow-y-auto">
-                      <NotificationItem
-                        icon={<AlertCircle className="text-red-500" size={16} />}
-                        title="Alat Terlambat"
-                        desc="Bor Listrik belum dikembalikan oleh Syarif"
-                        time="2 jam yang lalu"
-                        theme={theme}
-                      />
-                      <NotificationItem
-                        icon={<CheckCircle2 className="text-emerald-500" size={16} />}
-                        title="Stok Ditambahkan"
-                        desc="5 unit Obeng Set baru telah tiba"
-                        time="5 jam yang lalu"
-                        theme={theme}
-                      />
-                      <NotificationItem
-                        icon={<Package className="text-blue-500" size={16} />}
-                        title="Peminjaman Baru"
-                        desc="Admin menyetujui peminjaman Geofisika"
-                        time="Kemarin"
-                        theme={theme}
-                      />
-                    </div>
-                    <button className="w-full py-4 text-xs font-bold text-slate-500 hover:text-brand-green hover:bg-brand-green/5 transition-all">
-                      View All Activity
-                    </button>
+              {showLanguageMenu && (
+                <div className="absolute right-0 mt-2 w-42 bg-white rounded-2xl shadow-xl shadow-blue-500/10 border border-blue-50 overflow-hidden z-50">
+                  <div className="p-2">
+                    {languages.map((lang) => (
+                      <button
+                        key={lang.code}
+                        onClick={() => { setLanguage(lang.code); setShowLanguageMenu(false); }}
+                        className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm transition-all ${language === lang.code ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-600 hover:bg-slate-50'}`}
+                      >
+                        <span>{lang.flag}</span>
+                        <span>{lang.label}</span>
+                      </button>
+                    ))}
                   </div>
-                )}
-              </div>
-
-              {/* Theme Toggle */}
-              <div className={`flex p-1 rounded-full transition-colors ${theme === 'dark' ? 'bg-white/5' : 'bg-slate-100'}`}>
-                <button
-                  onClick={() => theme === 'dark' && toggleTheme()}
-                  className={`p-1.5 rounded-full transition-all ${theme === 'light' ? "bg-white shadow-sm text-brand-green" : "text-slate-500 hover:text-white"}`}
-                >
-                  <Sun size={16} />
-                </button>
-                <button
-                  onClick={() => theme === 'light' && toggleTheme()}
-                  className={`p-1.5 rounded-full transition-all ${theme === 'dark' ? "bg-brand-dark shadow-sm text-brand-green" : "text-slate-500 hover:text-slate-900"}`}
-                >
-                  <Moon size={16} />
-                </button>
-              </div>
+                </div>
+              )}
             </div>
+
+            <button className="relative w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-blue-100 text-blue-400 hover:text-pink-500 transition-colors shadow-sm active:scale-95">
+              <Bell size={20} />
+              <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-pink-500 rounded-full border-2 border-white"></span>
+            </button>
           </div>
         </header>
 
-        {/* Content Wrapper */}
-        <div className={`flex-1 overflow-y-auto p-8 transition-all duration-300 ${theme === 'dark' ? 'bg-(--background)' : 'bg-[#f8fafc]'}`}>
+        <section className="flex-1 overflow-y-auto p-4 lg:p-8 scrollbar-hide">
           {children}
-        </div>
+        </section>
 
-        {/* Full Screen Modals */}
         {showSettings && (
-          <div className={`fixed inset-0 z-60 flex items-center justify-center p-4 animate-in fade-in duration-200 ${theme === 'dark' ? 'bg-black/60' : 'bg-slate-900/40'} backdrop-blur-sm`}>
-            <div className={`w-full max-w-2xl rounded-[40px] shadow-2xl border overflow-hidden animate-in zoom-in-95 duration-200
-                      ${theme === 'dark' ? 'bg-(--background) border-(--border-color)' : 'bg-white border-slate-200'}`}>
-              <div className="p-8 flex items-center justify-between border-b border-white/5">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-brand-green/20 rounded-2xl flex items-center justify-center text-brand-green">
-                    <SettingsIcon size={24} />
-                  </div>
-                  <div>
-                    <h2 className="text-2xl font-bold">System Settings</h2>
-                    <p className="text-sm text-slate-500">Configure your application preference</p>
-                  </div>
+          <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-blue-900/20 backdrop-blur-sm">
+            <div className="w-full max-w-lg bg-white rounded-[32px] shadow-2xl border border-blue-50 overflow-hidden">
+              <div className="p-6 flex items-center justify-between border-b border-blue-50">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600"><SettingsIcon size={20} /></div>
+                  <h3 className="font-bold text-lg text-blue-900">{t('settings')}</h3>
                 </div>
-                <button onClick={() => setShowSettings(false)} className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors 
-                            ${theme === 'dark' ? 'hover:bg-white/5 text-slate-400' : 'hover:bg-slate-100 text-slate-500'}`}>
-                  <X size={20} />
-                </button>
+                <button onClick={() => setShowSettings(false)} className="p-2 hover:bg-blue-50 rounded-full text-slate-400 transition-colors"><X size={20} /></button>
               </div>
-
-              <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-                <SettingItem title="Appearance" icon={<Palette className="text-brand-green" size={18} />} theme={theme}>
-                  <p className="text-xs text-slate-500 mb-3">Switch between dark and light themes</p>
-                  <div className={`flex p-1 rounded-xl transition-colors ${theme === 'dark' ? 'bg-white/5' : 'bg-slate-100'}`}>
-                    <button onClick={toggleTheme} className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${theme === 'light' ? 'bg-white text-black shadow-sm' : 'text-slate-400'}`}>
-                      Light
-                    </button>
-                    <button onClick={toggleTheme} className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${theme === 'dark' ? 'bg-brand-green text-black' : 'text-slate-400'}`}>
-                      Dark
-                    </button>
-                  </div>
-                </SettingItem>
-
-                <SettingItem title="Profile" icon={<UserIcon className="text-blue-400" size={18} />} theme={theme}>
-                  <p className="text-xs text-slate-500 mb-2">Logged in as <span className="font-bold text-slate-400">{adminName}</span></p>
-                  <button className={`w-full py-2 rounded-xl text-xs font-bold border transition-all 
-                                ${theme === 'dark' ? 'border-white/10 hover:bg-white/5' : 'border-slate-200 hover:bg-slate-50'}`}>
-                    Change Information
-                  </button>
-                </SettingItem>
-
-                <SettingItem title="Security" icon={<Shield className="text-purple-400" size={18} />} theme={theme}>
-                  <p className="text-xs text-slate-500 mb-2">Update your secure password regularly</p>
-                  <button className={`w-full py-2 rounded-xl text-xs font-bold border transition-all 
-                                ${theme === 'dark' ? 'border-white/10 hover:bg-white/5' : 'border-slate-200 hover:bg-slate-50'}`}>
-                    Update Password
-                  </button>
-                </SettingItem>
-
-                <SettingItem title="Session" icon={<LogOut className="text-red-400" size={18} />} theme={theme}>
-                  <p className="text-xs text-slate-500 mb-2">End your current working session</p>
-                  <button onClick={logout} className="w-full py-2 rounded-xl text-xs font-bold bg-red-500 text-white hover:bg-red-600 transition-all">
-                    Logout Now
-                  </button>
-                </SettingItem>
+              <div className="p-8 space-y-6">
+                <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100">
+                  <div className="flex items-center gap-3 mb-4"><Palette className="text-pink-500" size={18} /><h4 className="font-bold text-sm">Appearance</h4></div>
+                  <p className="text-xs text-slate-500">Theme is managed by the system in Blue-Pink palette.</p>
+                </div>
+                <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100">
+                  <div className="flex items-center gap-3 mb-4"><Shield className="text-blue-500" size={18} /><h4 className="font-bold text-sm">Account Security</h4></div>
+                  <button className="w-full py-3 bg-white border border-blue-100 rounded-xl text-xs font-bold text-blue-600 hover:bg-blue-50 transition-all">Update Credentials</button>
+                </div>
+                <button onClick={logout} className="w-full py-4 bg-red-500 text-white rounded-2xl font-bold shadow-lg shadow-red-200 hover:bg-red-600 transition-all">Logout Session</button>
               </div>
             </div>
           </div>
         )}
       </main>
-    </div>
-  );
-}
-
-function NotificationItem({ icon, title, desc, time, theme }: any) {
-  return (
-    <div className={`px-6 py-4 flex gap-4 transition-colors cursor-pointer border-b last:border-none 
-            ${theme === 'dark' ? 'hover:bg-white/5 border-white/5 text-slate-300' : 'hover:bg-slate-50 border-slate-50 text-slate-600'}`}>
-      <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 
-                ${theme === 'dark' ? 'bg-white/5' : 'bg-slate-50'}`}>
-        {icon}
-      </div>
-      <div>
-        <p className="text-sm font-bold">{title}</p>
-        <p className="text-[10px] text-slate-500 line-clamp-1">{desc}</p>
-        <p className="text-[9px] text-brand-green font-bold mt-1 uppercase tracking-tighter">{time}</p>
-      </div>
-    </div>
-  );
-}
-
-function SettingItem({ title, icon, children, theme }: any) {
-  return (
-    <div className={`p-6 rounded-[32px] border transition-colors 
-            ${theme === 'dark' ? 'bg-white/5 border-white/5' : 'bg-slate-50 border-slate-100'}`}>
-      <div className="flex items-center gap-3 mb-4">
-        {icon}
-        <h4 className="font-bold text-sm tracking-tight">{title}</h4>
-      </div>
-      {children}
     </div>
   );
 }
