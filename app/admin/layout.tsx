@@ -14,12 +14,10 @@ import {
   X,
   Wrench,
   ChevronDown,
-  User as UserIcon,
   Shield,
   Palette,
   ClipboardList
 } from "lucide-react";
-import { useTheme } from "../context/ThemeContext";
 import { useTranslation } from "../context/LanguageContext";
 import { Language, TranslationKeys } from "@/lib/translations";
 
@@ -40,7 +38,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [adminName, setAdminName] = useState("User");
   const [userRole, setUserRole] = useState("");
-  const [userIdentifier, setUserIdentifier] = useState("");
   const [showLanguageMenu, setShowLanguageMenu] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
 
@@ -65,10 +62,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     setUserRole(role || "");
 
     const name = localStorage.getItem("nama");
-    const username = localStorage.getItem("username");
 
     if (name) setAdminName(name);
-    if (username) setUserIdentifier(username);
   }, [router]);
 
   const sidebarItems = SIDEBAR_ITEMS.filter(item => {
@@ -81,7 +76,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return true;
   }).map(item => {
     let path = item.path;
-    let labelKey = item.label.toLowerCase().replace(" ", "_") as TranslationKeys;
+    const labelKey = item.label.toLowerCase().replace(" ", "_") as TranslationKeys;
 
     if (userRole === "petugas" && item.label === "Dashboard") path = "/petugas";
     if (userRole === "peminjam") {

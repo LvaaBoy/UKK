@@ -16,7 +16,17 @@ import { useTheme } from "../../context/ThemeContext";
 
 export default function LaporanPage() {
     const { theme } = useTheme();
-    const [data, setData] = useState<any>(null);
+    const [data, setData] = useState<{
+        stats: {
+            totalPeminjaman: string;
+            alatTersedia: string;
+            totalUsers: string;
+        };
+        weeklyActivity: Array<{ day: string; count: number }>;
+        categoryDistribution: Array<{ name: string; value: number }>;
+        stockAlerts: Array<{ id: number; nama_alat: string; stok: number }>;
+        recentActivities: Array<{ id: string; user: string; item: string; date: string; status: string }>;
+    } | null>(null);
     const [loading, setLoading] = useState(true);
     const [printDate] = useState(new Date().toLocaleDateString('id-ID', {
         day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
