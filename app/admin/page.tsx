@@ -28,11 +28,14 @@ import { useTranslation } from "../context/LanguageContext";
 
 export default function AdminDashboard() {
   const [data, setData] = useState<{
-    stats: { totalLoans: string; availableTools: string; totalUsers: string };
-    weeklyActivity: Array<{ day: string; count: number }>;
-    categoryDistribution: Array<{ name: string; value: number }>;
-    stockAlerts: Array<{ id: number; nama_alat: string; stok: number }>;
+    stats: { totalPeminjaman: string; alatTersedia: string; totalUsers: string };
+    charts: {
+      weekly: Array<{ day: string; count: number }>;
+      categories: Array<{ name: string; value: number; color: string }>;
+    };
+    stockAlerts: Array<{ id: string; product: string; quantity: number; alert: number }>;
     recentActivities: Array<{ id: string; user: string; item: string; date: string; status: string }>;
+    error?: string;
   } | null>(null);
   const [loading, setLoading] = useState(true);
   const { t } = useTranslation();
