@@ -4,12 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowRight,
-  ArrowLeft,
-  Star as StarIcon,
-  Github,
-  Facebook,
-  ChevronRight,
-  Hammer,
   Wrench,
   Key,
   ShieldCheck,
@@ -132,25 +126,11 @@ export default function LoginPage() {
               )}
             </button>
           </form>
-
-          <div className="mt-12">
-            <div className="flex items-center gap-4 mb-8">
-              <div className="flex-1 h-px bg-slate-100"></div>
-              <span className="text-slate-300 text-[10px] font-black tracking-widest uppercase">Other ways</span>
-              <div className="flex-1 h-px bg-slate-100"></div>
-            </div>
-
-            <div className="flex justify-center gap-4">
-              <SocialButton icon={<Github size={20} />} />
-              <SocialButton icon={<Facebook size={20} className="text-blue-600" fill="currentColor" />} />
-              <SocialButton icon={<GoogleIcon />} />
-            </div>
-          </div>
         </div>
 
         <div className="text-center">
           <p className="text-slate-400 text-sm font-medium">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link href="/register" className="text-pink-500 hover:text-blue-600 font-black transition-colors underline underline-offset-4">
               Create one now
             </Link>
@@ -180,7 +160,7 @@ export default function LoginPage() {
               <div className="relative">
                 <span className="absolute -top-6 -left-4 text-8xl text-white/10 font-serif leading-none">"</span>
                 <p className="text-xl text-white/90 font-medium italic leading-relaxed relative z-10">
-                  "Lending tools here is incredibly smooth. Search, click, and pick up. It's transformed how I manage my projects."
+                  &ldquo;Lending tools here is incredibly smooth. Search, click, and pick up. It&apos;s transformed how I manage my projects.&rdquo;
                 </p>
               </div>
 
@@ -211,21 +191,5 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
-  );
-}
-
-function SocialButton({ icon }: { icon: React.ReactNode }) {
-  return (
-    <button className="w-14 h-14 bg-white border border-slate-100 rounded-2xl flex items-center justify-center hover:bg-slate-50 hover:border-blue-200 transition-all shadow-sm active:scale-90">
-      {icon}
-    </button>
-  );
-}
-
-function GoogleIcon() {
-  return (
-    <svg className="w-5 h-5" viewBox="0 0 24 24">
-      <path fill="#EA4335" d="M12.48 10.92v3.28h7.84c-.24 1.84-.90 3.28-2.10 4.36-1.50 1.28-3.70 1.96-6.44 1.96-5.04 0-9.14-3.66-9.14-8.16s4.10-8.16 9.14-8.16c2.81 0 4.85 1.11 6.19 2.4l2.23-2.23C18.14 2.25 15.36 1 12.48 1 c-6.45 0-11.69 5.25-11.69 11.69S5.30 24.38 11.69 24.38c3.22 0 6.04-1.06 8.24-3.22 2.12-2.12 3.32-5.46 3.32-8.36 0-1.12-.12-2.12-.32-2.88H12.48z" />
-    </svg>
   );
 }

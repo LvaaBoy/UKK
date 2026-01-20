@@ -3,8 +3,6 @@
 import { useEffect, useState } from "react";
 import {
   ClipboardList,
-  ChevronRight,
-  Search,
   Wrench,
   Clock,
   CheckCircle2,
@@ -17,7 +15,13 @@ import Link from "next/link";
 export default function UserPeminjamanPage() {
   const { theme } = useTheme();
   const [loading, setLoading] = useState(true);
-  const [loans, setLoans] = useState<any[]>([]);
+  const [loans, setLoans] = useState<Array<{
+    id: number;
+    nama_alat: string;
+    tgl_pinjam: string;
+    tgl_kembali: string;
+    status: string;
+  }>>([]);
 
   const [error, setError] = useState<string | null>(null);
 
@@ -27,9 +31,9 @@ export default function UserPeminjamanPage() {
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "Gagal mengambil data");
       setLoans(json);
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
-      setError(err.message);
+      setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
       setLoading(false);
     }
@@ -45,9 +49,9 @@ export default function UserPeminjamanPage() {
       if (!res.ok) throw new Error(json.error || "Gagal mengembalikan alat");
       alert("Alat berhasil dikembalikan!");
       fetchLoans();
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
-      alert(err.message);
+      alert(err instanceof Error ? err.message : "Unknown error");
     }
   };
 
