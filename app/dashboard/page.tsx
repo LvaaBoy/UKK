@@ -21,7 +21,7 @@ export default function UserDashboard() {
   const [data, setData] = useState<{
     stats: { pendingRequests: string; activeLoans: string; totalLoans: string };
     recentActivities: Array<{ id: string; item: string; date: string; status: string }>;
-    recommendedTools: Array<{ id: number; name: string; quantity: number }>;
+    recommendedTools: Array<{ id: number; name: string; quantity: number; deskripsi?: string }>;
     error?: string;
   } | null>(null);
 
