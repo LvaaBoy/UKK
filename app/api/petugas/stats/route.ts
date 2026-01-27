@@ -1,23 +1,30 @@
 import { db } from "@/lib/db";
 import { NextResponse } from "next/server";
 
+import { getUser } from "@/lib/auth-utils";
+
 export async function GET() {
-    try {
-        // 1. Pending Approvals (Status: pending)
-        const pendingRequestsRes = await db.query("SELECT COUNT(*) FROM peminjaman WHERE status = 'pending'");
-        const pendingRequests = parseInt(pendingRequestsRes.rows[0].count);
+  try {
+    const user = await getUser();
+    if (!user || (user.role !== "petugas" && user.role !== "admin")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-        // 2. Active Loans (Status: disetujui)
-        const activeLoansRes = await db.query("SELECT COUNT(*) FROM peminjaman WHERE status = 'disetujui'");
-        const activeLoans = parseInt(activeLoansRes.rows[0].count);
+    // 1. Pending Approvals (Status: pending)
+    const pendingRequestsRes = await db.query("SELECT COUNT(*) FROM peminjaman WHERE status = 'pending'");
+    const pendingRequests = parseInt(pendingRequestsRes.rows[0].count);
 
-        // 3. Tools Out (Count of tools currently borrowed)
-        // Assuming each approval takes 1 tool
-        const toolsOutRes = await db.query("SELECT COUNT(*) FROM peminjaman WHERE status = 'disetujui'");
-        const toolsOut = parseInt(toolsOutRes.rows[0].count);
+    // 2. Active Loans (Status: disetujui)
+    const activeLoansRes = await db.query("SELECT COUNT(*) FROM peminjaman WHERE status = 'disetujui'");
+    const activeLoans = parseInt(activeLoansRes.rows[0].count);
 
-        // 4. Activity Chart (Incoming requests per day)
-        const activityChartRes = await db.query(`
+    // 3. Tools Out (Count of tools currently borrowed)
+    // Assuming each approval takes 1 tool
+    const toolsOutRes = await db.query("SELECT COUNT(*) FROM peminjaman WHERE status = 'disetujui'");
+    const toolsOut = parseInt(toolsOutRes.rows[0].count);
+
+    // 4. Activity Chart (Incoming requests per day)
+    const activityChartRes = await db.query(`
       SELECT 
         TO_CHAR(tanggal_pinjam, 'Dy') as day,
         COUNT(*) as count
@@ -27,8 +34,8 @@ export async function GET() {
       ORDER BY tanggal_pinjam ASC
     `);
 
-        // 5. Incoming Requests (Top 5 pending)
-        const incomingRequestsRes = await db.query(`
+    // 5. Incoming Requests (Top 5 pending or pending_kembali)
+    const incomingRequestsRes = await db.query(`
       SELECT 
         p.id, 
         u.nama as user, 
@@ -38,13 +45,15 @@ export async function GET() {
       FROM peminjaman p
       JOIN users u ON p.user_id = u.id
       JOIN alat a ON p.alat_id = a.id
-      WHERE p.status = 'pending'
-      ORDER BY p.tanggal_pinjam DESC
-      LIMIT 5
+      WHERE p.status IN ('pending', 'pending_kembali')
+      ORDER BY 
+        CASE WHEN p.status = 'pending_kembali' THEN 1 ELSE 2 END,
+        p.tanggal_pinjam DESC
+      LIMIT 10
     `);
 
-        // 6. Active Tracking (Latest 5 approved loans)
-        const activeTrackingRes = await db.query(`
+    // 6. Active Tracking (Latest 5 approved loans)
+    const activeTrackingRes = await db.query(`
       SELECT 
         p.id, 
         u.nama as user, 
@@ -59,28 +68,49 @@ export async function GET() {
       LIMIT 5
     `);
 
-        return NextResponse.json({
-            stats: {
-                pendingRequests: pendingRequests.toLocaleString(),
-                activeLoans: activeLoans.toLocaleString(),
-                toolsOut: toolsOut.toLocaleString(),
-            },
-            charts: {
-                activity: activityChartRes.rows,
-            },
-            incomingRequests: incomingRequestsRes.rows.map(row => ({
-                ...row,
-                id: "#" + row.id,
-                status: row.status.toUpperCase()
-            })),
-            activeTracking: activeTrackingRes.rows.map(row => ({
-                ...row,
-                id: "#" + row.id,
-                status: row.status.toUpperCase()
-            }))
-        });
-    } catch (error) {
-        console.error("Petugas Stats API Error:", error);
-        return NextResponse.json({ error: "Gagal mengambil data petugas" }, { status: 500 });
-    }
+    // 7. Returned History (Latest 5 returned)
+    const returnedHistoryRes = await db.query(`
+      SELECT 
+        p.id, 
+        u.nama as user, 
+        a.nama_alat as item, 
+        TO_CHAR(p.tanggal_kembali, 'DD Mon') as date,
+        p.status
+      FROM peminjaman p
+      JOIN users u ON p.user_id = u.id
+      JOIN alat a ON p.alat_id = a.id
+      WHERE p.status = 'kembali'
+      ORDER BY p.tanggal_kembali DESC
+      LIMIT 5
+    `);
+
+    return NextResponse.json({
+      stats: {
+        pendingRequests: pendingRequests.toLocaleString(),
+        activeLoans: activeLoans.toLocaleString(),
+        toolsOut: toolsOut.toLocaleString(),
+      },
+      charts: {
+        activity: activityChartRes.rows,
+      },
+      incomingRequests: incomingRequestsRes.rows.map(row => ({
+        ...row,
+        id: "#" + row.id,
+        status: row.status.toUpperCase()
+      })),
+      activeTracking: activeTrackingRes.rows.map(row => ({
+        ...row,
+        id: "#" + row.id,
+        status: row.status.toUpperCase()
+      })),
+      returnedHistory: returnedHistoryRes.rows.map(row => ({
+        ...row,
+        id: "#" + row.id,
+        status: row.status.toUpperCase()
+      }))
+    });
+  } catch (error) {
+    console.error("Petugas Stats API Error:", error);
+    return NextResponse.json({ error: "Gagal mengambil data petugas" }, { status: 500 });
+  }
 }

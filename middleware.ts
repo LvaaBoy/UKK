@@ -4,10 +4,11 @@ import { jwtVerify } from "jose";
 export async function middleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
 
-  // login & api bebas
+  // 1. PUBLIC ROUTES (Login & Auth APIs)
   if (
     pathname.startsWith("/login") ||
-    pathname.startsWith("/api")
+    pathname.startsWith("/register") ||
+    pathname.startsWith("/api/auth")
   ) {
     return NextResponse.next();
   }

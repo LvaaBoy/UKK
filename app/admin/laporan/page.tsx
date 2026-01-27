@@ -10,8 +10,15 @@ import {
   CheckCircle2,
   Clock,
   Loader2,
+  Printer,
+  DollarSign,
+  Users
 } from "lucide-react";
-import { useTheme } from "../../context/ThemeContext";
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
+import { useRouter } from "next/navigation";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/Tabs";
 
 /* =====================
    TYPES
@@ -20,16 +27,7 @@ type Stats = {
   totalPeminjaman: string;
   alatTersedia: string;
   totalUsers: string;
-};
-
-type WeeklyActivity = {
-  day: string;
-  count: number;
-};
-
-type CategoryDistribution = {
-  name: string;
-  value: number;
+  revenue: number;
 };
 
 type StockAlert = {
@@ -43,15 +41,13 @@ type RecentActivity = {
   user: string;
   item: string;
   date: string;
-  status: "KEMBALI" | "DISETUJUI" | "DIPINJAM" | "PENDING" | "TERLAMBAT";
+  status: string;
 };
 
 type LaporanData = {
   stats: Stats;
-  weeklyActivity: WeeklyActivity[];
-  categoryDistribution: CategoryDistribution[];
-  stockAlerts: StockAlert[];
   recentActivities: RecentActivity[];
+  stockAlerts: StockAlert[];
 };
 
 type ReportCardProps = {
@@ -59,14 +55,13 @@ type ReportCardProps = {
   value: string;
   icon: React.ReactNode;
   trend: string;
-  color?: "emerald" | "red";
-  theme: "dark" | "light";
+  color?: "blue" | "pink" | "green" | "emerald";
 };
 
 export default function LaporanPage() {
-  const { theme } = useTheme();
   const [data, setData] = useState<LaporanData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const router = useRouter();
 
   const [printDate] = useState(
     new Date().toLocaleDateString("id-ID", {
@@ -82,8 +77,15 @@ export default function LaporanPage() {
     const fetchStats = async (): Promise<void> => {
       try {
         const res = await fetch("/api/admin/stats");
-        const json: LaporanData = await res.json();
-        setData(json);
+        const json = await res.json();
+
+        if (json.success) {
+          setData({
+            stats: json.data.stats,
+            recentActivities: json.data.recentActivities || [],
+            stockAlerts: json.data.stockAlerts || []
+          });
+        }
       } catch (err) {
         console.error("Failed to fetch statistics", err);
       } finally {
@@ -100,19 +102,29 @@ export default function LaporanPage() {
   if (loading) {
     return (
       <div className="flex h-[60vh] items-center justify-center">
-        <Loader2 className="w-10 h-10 text-brand-green animate-spin" />
+        <Loader2 className="w-10 h-10 text-blue-500 animate-spin" />
       </div>
     );
   }
 
-  if (!data) return null;
+  if (!data) {
+    return (
+      <div className="p-12 text-center bg-white rounded-[40px] border border-red-100 shadow-2xl shadow-red-500/5 mx-auto max-w-xl mt-20">
+        <h2 className="text-3xl font-black text-blue-900 mb-2">Failure</h2>
+        <p className="text-slate-500 mb-8 font-medium">Unable to load report data.</p>
+        <button onClick={() => window.location.reload()} className="px-10 py-4 bg-blue-600 text-white font-black rounded-2xl shadow-xl hover:bg-blue-700 transition-all uppercase text-sm tracking-widest">
+          Retry
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 max-w-7xl mx-auto pb-20">
       {/* Print Header */}
       <div className="hidden print:block mb-10 border-b-2 border-slate-200 pb-6 text-center">
         <h1 className="text-3xl font-black text-slate-900 uppercase tracking-tighter mb-1">
-          LAPORAN PEMINJAMAN ALAT
+          Laporan Peminjaman Alat
         </h1>
         <p className="text-slate-500 font-medium">
           Sistem Informasi Inventaris & Peminjaman Lab
@@ -125,153 +137,136 @@ export default function LaporanPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 print:hidden">
         <div>
-          <h1
-            className={`text-2xl font-bold ${
-              theme === "dark" ? "text-white" : "text-slate-800"
-            }`}
-          >
-            Laporan Aktivitas
-          </h1>
-          <p className="text-slate-500 text-sm mt-1">
-            Pantau performa dan riwayat peminjaman alat.
+          <h1 className="text-4xl font-black text-blue-900 tracking-tight">System Performance</h1>
+          <p className="text-slate-500 font-medium">
+            Comprehensive audit of borrowing history and inventory status.
           </p>
         </div>
-        <div className="flex gap-3">
-          <button
-            className={`px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 border transition-all
-            ${
-              theme === "dark"
-                ? "bg-white/5 border-white/10 text-slate-300"
-                : "bg-white border-slate-200 text-slate-600"
-            }`}
-          >
-            <Filter size={18} />
-            Filter Periode
-          </button>
-          <button
-            onClick={handleExportPDF}
-            className="bg-brand-green text-black px-6 py-2.5 rounded-xl font-bold flex items-center gap-2 shadow-lg active:scale-95"
-          >
-            <Download size={18} />
-            Export PDF
-          </button>
+        <div className="flex flex-col items-end gap-4">
+          <Tabs defaultValue="reports">
+            <TabsList>
+              <TabsTrigger value="overview" onClick={() => router.push("/admin")}>Overview</TabsTrigger>
+              <TabsTrigger value="reports">Reports</TabsTrigger>
+              <TabsTrigger value="audit" onClick={() => router.push("/admin/audit-logs")}>Audit Logs</TabsTrigger>
+            </TabsList>
+          </Tabs>
+          <div className="flex gap-3">
+            <Button variant="outline" className="hidden md:flex">
+              <Filter className="mr-2 h-4 w-4" /> Filter
+            </Button>
+            <Button onClick={handleExportPDF} className="shadow-lg shadow-blue-500/20">
+              <Printer className="mr-2 h-4 w-4" /> Export/Print
+            </Button>
+          </div>
         </div>
       </div>
 
       {/* Summary */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 print:grid-cols-2">
         <ReportCard
+          title="System Revenue"
+          value={`Rp ${data.stats.revenue.toLocaleString()}`}
+          icon={<DollarSign size={20} />}
+          trend="+Rp 450k"
+          color="emerald"
+        />
+        <ReportCard
           title="Total Peminjaman"
           value={data.stats.totalPeminjaman}
           icon={<History size={20} />}
-          trend="+12%"
-          theme={theme}
+          trend="+8%"
+          color="blue"
         />
         <ReportCard
-          title="Alat Tersedia"
+          title="Stok Tersedia"
           value={data.stats.alatTersedia}
           icon={<CheckCircle2 size={20} />}
-          trend="+3"
-          theme={theme}
-        />
-        <ReportCard
-          title="Total Anggota"
-          value={data.stats.totalUsers}
-          icon={<TrendingUp size={20} />}
-          trend="+2"
-          theme={theme}
-        />
-        <ReportCard
-          title="Aduan/Terlambat"
-          value="0"
-          icon={<Clock size={20} />}
           trend="Stable"
-          color="red"
-          theme={theme}
+          color="blue"
+        />
+        <ReportCard
+          title="Registered Users"
+          value={data.stats.totalUsers}
+          icon={<Users size={20} />}
+          trend="+12"
+          color="pink"
         />
       </div>
 
       {/* Table */}
-      <div
-        className={`rounded-[32px] border shadow-sm overflow-hidden ${
-          theme === "dark"
-            ? "bg-(--card-bg) border-(--card-border)"
-            : "bg-white border-slate-100"
-        }`}
-      >
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="uppercase text-[10px] text-slate-400">
-              <th className="px-8 py-6">Transaksi</th>
-              <th>Pengguna</th>
-              <th>Alat</th>
-              <th>Tanggal</th>
-              <th className="text-center">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.recentActivities.length > 0 ? (
-              data.recentActivities.map((row) => (
-                <tr key={row.id}>
-                  <td className="px-8 py-4 italic text-slate-400">#{row.id}</td>
-                  <td className="font-bold">{row.user}</td>
-                  <td>{row.item}</td>
-                  <td className="text-slate-400">{row.date}</td>
-                  <td className="text-center">
-                    <span className="px-3 py-1 rounded-full text-xs font-bold">
-                      {row.status}
-                    </span>
+      <Card className="overflow-hidden border-slate-100 bg-white shadow-xl shadow-slate-200/50 rounded-[32px]">
+        <div className="p-8 border-b border-slate-50">
+          <h3 className="font-black text-xl text-blue-900 uppercase tracking-tight">Borrowing Audit Log</h3>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm text-left">
+            <thead className="bg-slate-50/50">
+              <tr className="uppercase text-[10px] text-slate-400 font-black tracking-[0.2em]">
+                <th className="px-6 py-5">Transaction ID</th>
+                <th className="px-6 py-5">User</th>
+                <th className="px-6 py-5">Item</th>
+                <th className="px-6 py-5">Status</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-50 font-medium">
+              {data.recentActivities.length > 0 ? (
+                data.recentActivities.map((row) => (
+                  <tr key={row.id} className="hover:bg-blue-50/20 transition-colors group">
+                    <td className="px-6 py-5 font-mono text-xs text-slate-400">#{String(row.id).substring(0, 8)}</td>
+                    <td className="px-6 py-5 font-bold text-slate-800 group-hover:text-blue-600">{row.user}</td>
+                    <td className="px-6 py-5 text-slate-600">{row.item}</td>
+                    <td className="px-6 py-5">
+                      <Badge variant={
+                        row.status.toUpperCase() === 'DISETUJUI' || row.status.toUpperCase() === 'KEMBALI' ? 'success' :
+                          row.status.toUpperCase() === 'PENDING' ? 'warning' : 'destructive'
+                      }>
+                        {row.status}
+                      </Badge>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={4} className="py-20 text-center text-slate-400 font-black uppercase text-xs tracking-widest bg-slate-50/20">
+                    No borrowing activity found in current period.
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={5} className="py-20 text-center text-slate-300">
-                  Belum ada data peminjaman
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </Card>
     </div>
   );
 }
 
-/* =====================
-   COMPONENT
-===================== */
 function ReportCard({
   title,
   value,
   icon,
   trend,
-  color = "emerald",
-  theme,
+  color = "blue",
 }: ReportCardProps) {
+  const colorStyles = {
+    blue: "bg-blue-50 text-blue-600",
+    pink: "bg-pink-50 text-pink-600",
+    green: "bg-emerald-50 text-emerald-600",
+    emerald: "bg-emerald-50 text-emerald-600",
+  };
+
   return (
-    <div
-      className={`p-6 rounded-[32px] border shadow-sm ${
-        theme === "dark"
-          ? "bg-(--card-bg) border-(--card-border)"
-          : "bg-white border-slate-100"
-      }`}
-    >
-      <div className="flex justify-between mb-4">
-        <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-brand-green/10 text-brand-green">
+    <Card className="hover:shadow-2xl hover:shadow-blue-500/5 transition-all p-8 border-slate-100 rounded-[32px] group relative overflow-hidden bg-white">
+      <div className="flex justify-between mb-6">
+        <div className={`w-12 h-12 flex items-center justify-center rounded-2xl ${colorStyles[color]} group-hover:scale-110 transition-transform`}>
           {icon}
         </div>
-        <span
-          className={`text-xs font-bold ${
-            color === "red" ? "text-red-500" : "text-emerald-500"
-          }`}
-        >
-          <ArrowUpRight size={12} />
+        <span className="text-[10px] font-black text-emerald-500 flex items-center gap-1 bg-emerald-50 px-3 py-1.5 rounded-full uppercase italic">
+          <ArrowUpRight size={14} />
           {trend}
         </span>
       </div>
-      <p className="text-xs font-bold text-slate-400 uppercase">{title}</p>
-      <h4 className="text-2xl font-bold">{value}</h4>
-    </div>
+      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{title}</p>
+      <h4 className="text-3xl font-black text-blue-900 tracking-tighter">{value}</h4>
+    </Card>
   );
 }

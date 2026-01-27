@@ -13,6 +13,8 @@ import {
   ArrowRight
 } from "lucide-react";
 import { useTranslation } from "../context/LanguageContext";
+import { useNotification } from "@/context/NotificationContext";
+import { EquipmentDetailModal } from "@/components/inventory/EquipmentDetailModal";
 import Link from "next/link";
 
 export default function UserDashboard() {
@@ -21,9 +23,16 @@ export default function UserDashboard() {
   const [data, setData] = useState<{
     stats: { pendingRequests: string; activeLoans: string; totalLoans: string };
     recentActivities: Array<{ id: string; item: string; date: string; status: string }>;
-    recommendedTools: Array<{ id: number; name: string; quantity: number; deskripsi?: string }>;
+    recommendedTools: Array<{ id: number; name: string; nama_alat?: string; quantity: number; stok?: number; deskripsi?: string; nama_kategori?: string }>;
     error?: string;
   } | null>(null);
+
+  const { showToast } = useNotification();
+  const [showModal, setShowModal] = useState(false);
+  const [selectedTool, setSelectedTool] = useState<any>(null);
+  const [modalMode, setModalMode] = useState<'detail' | 'borrow'>('detail');
+  const [tanggalKembali, setTanggalKembali] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     fetch("/api/user/stats")
@@ -44,6 +53,55 @@ export default function UserDashboard() {
         setLoading(false);
       });
   }, []);
+
+  const handleOpenDetail = (tool: any) => {
+    // Normalize data structure for the modal
+    const normalizedTool = {
+      ...tool,
+      nama_alat: tool.nama_alat || tool.name,
+      stok: tool.stok ?? tool.quantity,
+      nama_kategori: tool.nama_kategori || "General Equipment"
+    };
+    setSelectedTool(normalizedTool);
+    setModalMode('detail');
+    setShowModal(true);
+  };
+
+  const handleBorrow = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedTool || !tanggalKembali) return;
+
+    setSubmitting(true);
+    showToast("Mengirim pengajuan...", "loading");
+
+    try {
+      const res = await fetch("/api/user/peminjaman", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          alat_id: selectedTool.id,
+          tanggal_pinjam: new Date().toISOString().split('T')[0],
+          tanggal_kembali: tanggalKembali
+        }),
+      });
+
+      const result = await res.json();
+
+      if (res.ok) {
+        showToast("Pengajuan berhasil dikirim!", "success");
+        setShowModal(false);
+        setTanggalKembali("");
+        // Refresh stats if needed, or just let it be
+      } else {
+        showToast(result.error || "Gagal mengirim pengajuan.", "error");
+      }
+    } catch (err) {
+      console.error(err);
+      showToast("Terjadi kesalahan sistem.", "error");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -177,24 +235,35 @@ export default function UserDashboard() {
 
           <div className="space-y-4 relative z-10">
             {data.recommendedTools.map((tool) => (
-              <Link
+              <div
                 key={tool.id}
-                href={`/dashboard/alat?borrow=${tool.id}`}
-                className="block p-5 bg-slate-50/50 hover:bg-blue-50/30 rounded-3xl border border-transparent hover:border-blue-100 transition-all group"
+                onClick={() => handleOpenDetail(tool)}
+                className="block p-5 bg-slate-50/50 hover:bg-blue-50/30 rounded-3xl border border-transparent hover:border-blue-100 transition-all group cursor-pointer"
               >
                 <div className="flex justify-between items-start mb-3">
-                  <h4 className="font-black text-blue-900 group-hover:text-blue-500 transition-colors text-sm uppercase tracking-tight">{tool.name}</h4>
-                  <div className="px-2 py-0.5 bg-white border border-slate-100 rounded-md text-[9px] font-black text-pink-500 uppercase">{t('stock')}: {tool.quantity}</div>
+                  <h4 className="font-black text-blue-900 group-hover:text-blue-500 transition-colors text-sm uppercase tracking-tight">{tool.nama_alat || tool.name}</h4>
+                  <div className="px-2 py-0.5 bg-white border border-slate-100 rounded-md text-[9px] font-black text-pink-500 uppercase">{t('stock')}: {tool.stok ?? tool.quantity}</div>
                 </div>
                 <p className="text-[10px] text-slate-400 font-medium line-clamp-2 leading-relaxed mb-4">{tool.deskripsi || t('premium_equipment_desc')}</p>
                 <div className="flex items-center text-[10px] font-black text-blue-500 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
                   {t('lend_now')} <ChevronRight size={12} className="ml-1" />
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
         </div>
       </div>
+      <EquipmentDetailModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        tool={selectedTool}
+        modalMode={modalMode}
+        setModalMode={setModalMode}
+        tanggalKembali={tanggalKembali}
+        setTanggalKembali={setTanggalKembali}
+        handleBorrow={handleBorrow}
+        submitting={submitting}
+      />
     </div>
   );
 }

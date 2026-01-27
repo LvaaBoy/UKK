@@ -13,12 +13,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Peminjaman Barang",
-  description: "Aplikasi management peminjaman alat UKK",
+  title: "UKK Inventory System",
+  description: "Platform manajemen peminjaman alat praktik dan aset laboratorium. Efisien, transparan, dan terintegrasi.",
 };
 
 import { ThemeProvider } from "./context/ThemeContext";
 import { LanguageProvider } from "./context/LanguageContext";
+import { NotificationProvider } from "@/context/NotificationContext";
 
 export default function RootLayout({
   children,
@@ -31,9 +32,11 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <LanguageProvider>
-          <ThemeProvider>
-            {children}
-          </ThemeProvider>
+          <NotificationProvider>
+            <ThemeProvider>
+              {children}
+            </ThemeProvider>
+          </NotificationProvider>
         </LanguageProvider>
       </body>
     </html>

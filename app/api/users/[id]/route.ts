@@ -1,19 +1,31 @@
 import { db } from "@/lib/db";
-import { NextResponse } from "next/server";
+import { getUser } from "@/lib/auth-utils";
+import { apiResponse, apiError, logAction } from "@/lib/api-utils";
 
 export async function PUT(
     req: Request,
     { params }: { params: Promise<{ id: string }> }
 ) {
     const { id } = await params;
-    const { nama, username, role } = await req.json();
+    try {
+        const currentUser = await getUser();
+        if (!currentUser || currentUser.role !== "admin") {
+            return apiError("Unauthorized", undefined, 401);
+        }
 
-    await db.query(
-        "UPDATE users SET nama=$1, username=$2, role=$3 WHERE id=$4",
-        [nama, username, role, id]
-    );
+        const { nama, username, role } = await req.json();
 
-    return NextResponse.json({ message: "User berhasil diupdate" });
+        await db.query(
+            "UPDATE users SET nama=$1, username=$2, role=$3 WHERE id=$4",
+            [nama, username, role, id]
+        );
+
+        await logAction(currentUser.id, "UPDATE_USER", id, { nama, username, role });
+
+        return apiResponse({ message: "User updated successfully" });
+    } catch (error: any) {
+        return apiError("Failed to update user", error.message, 500);
+    }
 }
 
 export async function DELETE(
@@ -22,10 +34,18 @@ export async function DELETE(
 ) {
     const { id } = await params;
     try {
+        const currentUser = await getUser();
+        if (!currentUser || currentUser.role !== "admin") {
+            return apiError("Unauthorized", undefined, 401);
+        }
+
         // Basic protection: don't delete if related to peminjaman (handled by DB constraints usually)
         await db.query("DELETE FROM users WHERE id=$1", [id]);
-        return NextResponse.json({ message: "User berhasil dihapus" });
-    } catch {
-        return NextResponse.json({ error: "Gagal menghapus user. Mungkin masih terkait dengan data transaksi." }, { status: 500 });
+
+        await logAction(currentUser.id, "DELETE_USER", id);
+
+        return apiResponse({ message: "User deleted successfully" });
+    } catch (error: any) {
+        return apiError("Failed to delete user. It may be linked to transaction data.", error.message, 500);
     }
 }

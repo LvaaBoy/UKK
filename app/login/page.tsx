@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   ArrowRight,
   Wrench,
@@ -12,7 +13,9 @@ import {
   Loader2
 } from "lucide-react";
 import { useTranslation } from "../context/LanguageContext";
-import Link from "next/link";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/Card";
 
 export default function LoginPage() {
   const { t } = useTranslation();
@@ -58,138 +61,161 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen w-full bg-[#f8fafc] overflow-hidden font-sans">
-      {/* Left Side: Login Form */}
-      <div className="flex-1 flex flex-col justify-between p-8 md:p-16 lg:p-24 bg-white relative">
-        <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-blue-500 via-pink-500 to-blue-500" />
-
-        <div>
-          <Link href="/" className="text-2xl font-black flex items-center gap-3 text-blue-900 group w-fit">
-            <div className="w-10 h-10 bg-blue-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-200 group-hover:rotate-12 transition-transform">
-              <Wrench size={22} />
-            </div>
-            <span>UKK <span className="text-pink-500">Inventory</span></span>
-          </Link>
-        </div>
-
-        <div className="max-w-md w-full mx-auto py-12">
-          <div className="mb-10 space-y-2">
-            <h2 className="text-3xl md:text-4xl font-black text-blue-900 tracking-tight leading-tight">
-              {t('login_title')}
-            </h2>
-            <p className="text-slate-400 font-medium tracking-tight">Access your professional toolkit.</p>
-          </div>
-
-          <form onSubmit={login} className="space-y-6">
-            <div className="space-y-2">
-              <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">{t('search').split(' ')[0]}</label>
-              <div className="relative group">
-                <User size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-blue-500 transition-colors" />
-                <input
-                  required
-                  type="text"
-                  placeholder="Enter your username"
-                  className="w-full bg-slate-50 text-blue-900 pl-12 pr-4 py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 border border-slate-100 focus:border-blue-500 transition-all font-bold placeholder:text-slate-300"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex justify-between items-center ml-1">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Password</label>
-                <a href="#" className="text-[10px] font-black text-blue-500 hover:text-pink-500 uppercase tracking-widest transition-colors">Forgot?</a>
-              </div>
-              <div className="relative group">
-                <Key size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-blue-500 transition-colors" />
-                <input
-                  required
-                  type="password"
-                  placeholder="••••••••"
-                  className="w-full bg-slate-50 text-blue-900 pl-12 pr-4 py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 border border-slate-100 focus:border-blue-500 transition-all font-bold placeholder:text-slate-300"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <button
-              disabled={loading}
-              type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-2xl transition-all flex items-center justify-center gap-3 shadow-xl shadow-blue-500/20 active:scale-95 group"
-            >
-              {loading ? <Loader2 className="animate-spin" size={20} /> : (
-                <>
-                  SIGN IN <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-                </>
-              )}
-            </button>
-          </form>
-        </div>
-
-        <div className="text-center">
-          <p className="text-slate-400 text-sm font-medium">
-            Don&apos;t have an account?{" "}
-            <Link href="/register" className="text-pink-500 hover:text-blue-600 font-black transition-colors underline underline-offset-4">
-              Create one now
-            </Link>
-          </p>
-        </div>
+    <div className="flex min-h-screen w-full bg-slate-50 relative overflow-hidden">
+      {/* Background Decor */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+        <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-blue-400/20 rounded-full blur-[120px] animate-float" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-pink-400/20 rounded-full blur-[100px] animate-float" style={{ animationDelay: "2s" }} />
       </div>
 
-      {/* Right Side: Visual Content */}
-      <div className="hidden md:flex flex-1 items-center justify-center relative bg-linear-to-br from-blue-600 to-pink-500 p-12 overflow-hidden">
-        {/* Animated Orbs */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-white opacity-10 blur-[100px] -mr-20 -mt-20 animate-pulse" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-pink-300 opacity-10 blur-[100px] -ml-20 -mb-20" />
+      {/* Main Container */}
+      <div className="z-10 w-full max-w-6xl mx-auto flex items-center justify-center p-4 lg:p-8">
+        <div className="grid lg:grid-cols-2 gap-8 w-full">
 
-        <div className="relative w-full max-w-lg z-10">
-          <div className="bg-white/10 backdrop-blur-2xl border border-white/20 p-12 rounded-[50px] shadow-2xl relative overflow-hidden group">
-            <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/5 rounded-full group-hover:scale-150 transition-transform duration-1000" />
+          {/* Left: Login Form */}
+          <div className="flex flex-col justify-center">
+            <Card className="border-white/50 shadow-2xl backdrop-blur-xl bg-white/80">
+              <CardHeader className="pb-8">
+                <div className="flex items-center gap-2 mb-6 text-blue-600">
+                  <div className="p-2 bg-blue-100 rounded-lg">
+                    <Wrench className="h-6 w-6" />
+                  </div>
+                  <span className="font-bold text-xl tracking-tight text-slate-800">UKK Inventory</span>
+                </div>
+                <CardTitle className="text-3xl font-bold text-slate-800">Welcome Back</CardTitle>
+                <CardDescription className="text-slate-500 text-base mt-2">
+                  Enter your credentials to access the management system.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={login} className="space-y-6">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700 ml-1">Username</label>
+                    <div className="relative group">
+                      <User size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+                      <Input
+                        required
+                        className="pl-10 bg-white"
+                        placeholder="Enter your username"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                      />
+                    </div>
+                  </div>
 
-            <div className="relative z-20 space-y-8">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full text-xs font-black text-white uppercase tracking-widest border border-white/10">
-                <Sparkles size={14} className="text-pink-300" /> Member Testimonial
-              </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center ml-1">
+                      <label className="text-sm font-medium text-slate-700">Password</label>
+                      <Link href="#" className="text-xs font-semibold text-blue-600 hover:text-blue-700 hover:underline">
+                        Forgot password?
+                      </Link>
+                    </div>
+                    <div className="relative group">
+                      <Key size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+                      <Input
+                        required
+                        type="password"
+                        className="pl-10 bg-white"
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                      />
+                    </div>
+                  </div>
 
-              <h3 className="text-4xl lg:text-5xl font-black text-white leading-tight">
-                Borrow with <span className="text-blue-200">Confidence.</span>
-              </h3>
+                  <Button
+                    disabled={loading}
+                    type="submit"
+                    className="w-full h-12 text-base shadow-blue-500/25 shadow-lg hover:shadow-blue-500/40 transition-all"
+                  >
+                    {loading ? <Loader2 className="animate-spin mr-2" size={20} /> : "Sign In to Dashboard"}
+                  </Button>
+                </form>
+              </CardContent>
+              <CardFooter className="justify-center border-t border-slate-100 pt-6">
+                <p className="text-slate-500 text-sm">
+                  Don't have an account?{" "}
+                  <Link href="/register" className="text-blue-600 font-bold hover:underline">
+                    Register here
+                  </Link>
+                </p>
+              </CardFooter>
+            </Card>
+          </div>
 
-              <div className="relative">
-                <span className="absolute -top-6 -left-4 text-8xl text-white/10 font-serif leading-none">&ldquo;</span>
-                <p className="text-xl text-white/90 font-medium italic leading-relaxed relative z-10">
-                  &ldquo;Lending tools here is incredibly smooth. Search, click, and pick up. It&apos;s transformed how I manage my projects.&rdquo;
+          {/* Right: Feature Showcase (Hidden on mobile) */}
+          <div className="hidden lg:flex flex-col justify-center relative">
+            <div className="absolute inset-0 bg-blue-600/5 rounded-3xl backdrop-blur-sm transform rotate-3 scale-95 z-0" />
+            <div className="glass-card bg-white/40 p-10 border border-white/60 relative z-10 flex flex-col justify-between h-[600px] overflow-hidden group">
+
+              {/* Decor Circles */}
+              <div className="absolute -top-20 -right-20 w-64 h-64 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full blur-3xl opacity-20 group-hover:opacity-30 transition-opacity duration-700" />
+
+              <div className="space-y-6">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/60 rounded-full text-xs font-bold text-blue-700 border border-white/50 backdrop-blur-md">
+                  <Sparkles size={14} className="fill-blue-400 text-blue-400" />
+                  New Feature
+                </div>
+                <h3 className="text-4xl font-extrabold text-slate-800 leading-tight">
+                  Manage your <br />
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-pink-500">
+                    Inventory Assets
+                  </span>
+                  <br /> with ease.
+                </h3>
+                <p className="text-slate-600 text-lg leading-relaxed max-w-sm">
+                  Track borrowings, manage stock, and generate reports in real-time with our new streamlined dashboard.
                 </p>
               </div>
 
-              <div className="flex items-center gap-4 pt-4 border-t border-white/10">
-                <div className="w-14 h-14 rounded-2xl bg-linear-to-br from-blue-400 to-pink-400 border border-white/30 flex items-center justify-center text-white font-black text-xl shadow-lg">
-                  MP
+              <div className="relative mt-8">
+                {/* Mock UI Element */}
+                <div className="bg-white/90 rounded-2xl p-4 shadow-xl border border-blue-100 transform rotate-[-2deg] opacity-90 group-hover:rotate-0 group-hover:scale-105 transition-all duration-500">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="h-8 w-8 bg-green-100 rounded-full flex items-center justify-center">
+                      <ShieldCheck className="w-4 h-4 text-green-600" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-slate-800 text-sm">Item Returned</p>
+                      <p className="text-xs text-slate-400">Just now</p>
+                    </div>
+                  </div>
+                  <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                    <div className="h-full w-3/4 bg-green-500 rounded-full" />
+                  </div>
                 </div>
-                <div>
-                  <p className="font-bold text-xl text-white">Mas Parjono</p>
-                  <p className="text-white/60 text-sm font-bold uppercase tracking-wider">Project Lead @ BuildIt</p>
+
+                <div className="bg-white/90 rounded-2xl p-4 shadow-xl border border-pink-100 transform translate-y-[-10px] translate-x-[20px] rotate-[3deg] group-hover:translate-x-[10px] group-hover:rotate-[5deg] transition-all duration-500 delay-75">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="h-8 w-8 bg-pink-100 rounded-full flex items-center justify-center">
+                      <User className="w-4 h-4 text-pink-600" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-slate-800 text-sm">New Request</p>
+                      <p className="text-xs text-slate-400">2 mins ago</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <div className="h-6 w-16 bg-pink-500 rounded-md" />
+                    <div className="h-6 w-6 bg-slate-200 rounded-md" />
+                  </div>
                 </div>
+              </div>
+
+              <div className="flex items-center gap-2 text-sm text-slate-500 font-medium">
+                <div className="flex -space-x-2">
+                  {[1, 2, 3].map(i => (
+                    <div key={i} className={`w-8 h-8 rounded-full border-2 border-white bg-slate-200 bg-[url('https://i.pravatar.cc/100?img=${i + 10}')] bg-cover`} />
+                  ))}
+                </div>
+                <span>used by 500+ students</span>
               </div>
             </div>
           </div>
 
-          {/* Floating Card */}
-          <div className="absolute -bottom-6 -left-6 bg-white p-6 rounded-[32px] shadow-2xl max-w-[280px] z-30 animate-bounce-slow">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center shadow-inner">
-                <ShieldCheck size={24} />
-              </div>
-              <div>
-                <h4 className="font-black text-blue-900 text-sm uppercase tracking-tighter">Verified Tech</h4>
-                <p className="text-[10px] text-slate-400 font-bold leading-tight mt-0.5">Instant asset tracking & audit logs enabled.</p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
   );
 }
+
