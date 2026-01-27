@@ -46,18 +46,18 @@ export function EquipmentDetailModal({
                 className="fixed inset-0 bg-slate-900/60 backdrop-blur-xl animate-in fade-in duration-300"
                 onClick={onClose}
             />
-            <div className={`rounded-[40px] md:rounded-[52px] w-full max-w-4xl overflow-hidden relative shadow-2xl animate-in zoom-in-95 duration-500 border flex flex-col lg:flex-row min-h-[500px] lg:h-[600px]
+            <div className={`rounded-3xl md:rounded-[52px] w-full max-w-4xl max-h-[90vh] md:h-[600px] overflow-hidden relative shadow-2xl animate-in zoom-in-95 duration-500 border flex flex-col lg:flex-row
                 ${theme === 'dark' ? 'bg-brand-card border-white/5 text-white' : 'bg-white border-slate-100 text-slate-800'}`}>
 
                 <button
                     onClick={onClose}
-                    className="absolute top-6 right-6 z-20 p-3 rounded-full bg-black/10 hover:bg-black/20 backdrop-blur-md text-white transition-all hover:rotate-90 active:scale-90"
+                    className="absolute top-4 right-4 md:top-6 md:right-6 z-20 p-3 rounded-full bg-black/10 hover:bg-black/20 backdrop-blur-md text-white transition-all hover:rotate-90 active:scale-90"
                 >
                     <X size={20} />
                 </button>
 
                 {/* Left Side: Visuals */}
-                <div className="lg:w-1/2 relative bg-slate-950 min-h-[250px] lg:min-h-0 overflow-hidden group">
+                <div className="lg:w-1/2 relative bg-slate-950 min-h-[220px] md:min-h-[300px] lg:min-h-0 overflow-hidden group shrink-0">
                     {tool.gambar ? (
                         <img
                             src={tool.gambar}
@@ -74,7 +74,7 @@ export function EquipmentDetailModal({
                         <span className="text-[10px] font-black uppercase tracking-[0.3em] px-3 py-1.5 bg-brand-green text-black rounded-lg inline-block mb-4 shadow-lg shadow-emerald-500/20">
                             {tool.nama_kategori}
                         </span>
-                        <h2 className="text-3xl md:text-4xl font-black text-white leading-tight tracking-tight">{tool.nama_alat}</h2>
+                        <h2 className="text-2xl md:text-4xl font-black text-white leading-tight tracking-tight">{tool.nama_alat}</h2>
                         <div className="flex items-center gap-4 mt-4 opacity-60">
                             <div className="flex items-center gap-1.5">
                                 <span className="w-1.5 h-1.5 rounded-full bg-brand-green" />
@@ -89,9 +89,9 @@ export function EquipmentDetailModal({
                 </div>
 
                 {/* Right Side: Content/Form */}
-                <div className="lg:w-1/2 p-8 md:p-12 flex flex-col justify-between bg-inherit relative overflow-y-auto">
+                <div className="lg:w-1/2 p-6 md:p-12 flex flex-col justify-between bg-inherit relative overflow-y-auto">
                     {modalMode === 'detail' ? (
-                        <div className="space-y-10 animate-in slide-in-from-right-8 duration-500">
+                        <div className="space-y-8 md:space-y-10 animate-in slide-in-from-right-8 duration-500">
                             <div className="space-y-5">
                                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] block">Technical Narrative</label>
                                 <div className="space-y-4">
@@ -106,13 +106,13 @@ export function EquipmentDetailModal({
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
-                                <div className="p-5 rounded-3xl bg-slate-50 border border-slate-100 dark:bg-white/5 dark:border-white/5 group hover:bg-brand-green/5 hover:border-brand-green/20 transition-all duration-300">
+                                <div className="p-4 md:p-5 rounded-2xl md:rounded-3xl bg-slate-50 border border-slate-100 dark:bg-white/5 dark:border-white/5 group hover:bg-brand-green/5 hover:border-brand-green/20 transition-all duration-300">
                                     <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">Availability</p>
-                                    <p className={`text-2xl font-black tracking-tighter ${tool.stok > 0 ? 'text-brand-green' : 'text-rose-500'}`}>{tool.stok} <span className="text-xs font-bold uppercase tracking-widest text-slate-400 ml-1">Units</span></p>
+                                    <p className={`text-xl md:text-2xl font-black tracking-tighter ${tool.stok > 0 ? 'text-brand-green' : 'text-rose-500'}`}>{tool.stok} <span className="text-xs font-bold uppercase tracking-widest text-slate-400 ml-1">Units</span></p>
                                 </div>
-                                <div className="p-5 rounded-3xl bg-slate-50 border border-slate-100 dark:bg-white/5 dark:border-white/5 group hover:bg-indigo-500/5 hover:border-indigo-500/20 transition-all duration-300">
+                                <div className="p-4 md:p-5 rounded-2xl md:rounded-3xl bg-slate-50 border border-slate-100 dark:bg-white/5 dark:border-white/5 group hover:bg-indigo-500/5 hover:border-indigo-500/20 transition-all duration-300">
                                     <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">Status</p>
-                                    <p className="text-2xl font-black text-indigo-500 tracking-tighter">Ready <span className="text-xs font-bold uppercase tracking-widest text-slate-400 ml-1">To Use</span></p>
+                                    <p className="text-xl md:text-2xl font-black text-indigo-500 tracking-tighter">Ready <span className="text-xs font-bold uppercase tracking-widest text-slate-400 ml-1">To Use</span></p>
                                 </div>
                             </div>
 
@@ -142,11 +142,11 @@ export function EquipmentDetailModal({
 
                             <div className="space-y-8 flex-1">
                                 <div className="space-y-2">
-                                    <h3 className="text-3xl font-black tracking-tight">Plan Your Usage</h3>
+                                    <h3 className="text-2xl md:text-3xl font-black tracking-tight">Plan Your Usage</h3>
                                     <p className="text-slate-400 text-sm font-medium leading-relaxed">Tentukan durasi penggunaan alat untuk memastikan ketersediaan bagi pengguna lain.</p>
                                 </div>
 
-                                <form onSubmit={handleBorrow} className="space-y-8">
+                                <form onSubmit={handleBorrow} className="space-y-6 md:space-y-8">
                                     <div className="space-y-4">
                                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] ml-1">Pengembalian Terjadwal</label>
                                         <div className="relative group/input">
@@ -155,7 +155,7 @@ export function EquipmentDetailModal({
                                                 required
                                                 type="date"
                                                 min={new Date().toISOString().split('T')[0]}
-                                                className={`w-full pl-16 pr-8 py-6 border-none rounded-[24px] focus:ring-8 focus:ring-brand-green/10 transition-all font-black text-lg 
+                                                className={`w-full pl-16 pr-8 py-5 md:py-6 border-none rounded-[20px] md:rounded-[24px] focus:ring-8 focus:ring-brand-green/10 transition-all font-black text-base md:text-lg 
                                                     ${theme === 'dark' ? 'bg-white/5 text-white' : 'bg-slate-50 text-slate-800'}`}
                                                 value={tanggalKembali}
                                                 onChange={(e) => setTanggalKembali(e.target.value)}
@@ -175,7 +175,7 @@ export function EquipmentDetailModal({
                                     <button
                                         type="submit"
                                         disabled={submitting}
-                                        className="w-full py-6 bg-brand-green text-black font-black rounded-[28px] shadow-2xl shadow-emerald-500/30 active:scale-95 transition-all flex items-center justify-center gap-4 text-xl h-24 group overflow-hidden relative"
+                                        className="w-full py-5 md:py-6 bg-brand-green text-black font-black rounded-2xl md:rounded-[28px] shadow-2xl shadow-emerald-500/30 active:scale-95 transition-all flex items-center justify-center gap-4 text-lg md:text-xl h-20 md:h-24 group overflow-hidden relative"
                                     >
                                         <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
                                         {submitting ? (
