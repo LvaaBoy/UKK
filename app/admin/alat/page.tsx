@@ -8,27 +8,25 @@ import {
   Trash2,
   Edit2,
   History,
-  ChevronRight,
   Box,
-  MoreHorizontal,
   RefreshCw,
-  AlertCircle,
-  X,
   LayoutGrid,
   Filter,
-  ArrowUpDown
+  ArrowUpDown,
+  X
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
+import { Card } from "@/components/ui/Card";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { useNotification } from "@/context/NotificationContext";
 import { EquipmentDetailModal } from "@/components/inventory/EquipmentDetailModal";
+import { useTranslation } from "@/app/context/LanguageContext";
 
 function AlatContent() {
   const { showToast, showConfirm } = useNotification();
+  const { t, language } = useTranslation();
   const searchParams = useSearchParams();
   const [alat, setAlat] = useState<Array<{
     id: number;
@@ -50,7 +48,27 @@ function AlatContent() {
   const [selectedToolForDetail, setSelectedToolForDetail] = useState<any>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  // Form State
+  const translateCategory = (name: string) => {
+    if (!name) return "";
+    const key = `category_${name.toLowerCase().replace(/\s+/g, "_")}` as any;
+    const translated = t(key);
+    return translated === key ? name : translated;
+  };
+
+  const translateName = (name: string) => {
+    if (!name) return "";
+    const key = `tool_name_${name.toLowerCase().replace(/\s+/g, '_')}` as any;
+    const translated = t(key);
+    return translated === key ? name : translated;
+  };
+
+  const translateDesc = (desc: string, name: string) => {
+    if (!name) return desc;
+    const key = `tool_desc_${name.toLowerCase().replace(/\s+/g, '_')}` as any;
+    const translated = t(key);
+    return translated === key ? desc : translated;
+  };
+
   const [formData, setFormData] = useState({
     id: null as number | null,
     nama_alat: "",
@@ -66,19 +84,17 @@ function AlatContent() {
         fetch("/api/alat"),
         fetch("/api/kategori")
       ]);
-
       if (resAlat.ok) {
         const json = await resAlat.json();
         setAlat(json.success ? json.data : []);
       }
-
       if (resCat.ok) {
         const json = await resCat.json();
         setCategories(json.success ? json.data : []);
       }
     } catch (err) {
       console.error("[ALAT_FETCH_ERROR]", err);
-      showToast("Gagal memuat data inventaris.", "error");
+      showToast(t("error_loading_data"), "error");
     } finally {
       setLoading(false);
     }
@@ -114,51 +130,45 @@ function AlatContent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-    showToast(`${formData.id ? 'Memperbarui' : 'Menyimpan'} data...`, "loading");
+    showToast(t("saving"), "loading");
     try {
       const isEdit = !!formData.id;
       const url = isEdit ? `/api/alat/${formData.id}` : "/api/alat";
       const method = isEdit ? "PUT" : "POST";
-
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-
       if (res.ok) {
         setShowModal(false);
-        showToast(`Alat berhasil ${isEdit ? 'diperbarui' : 'ditambahkan'}!`, "success");
+        showToast(isEdit ? t("item_updated") : t("item_added"), "success");
         fetchData();
       } else {
-        showToast("Gagal menyimpan data alat.", "error");
+        showToast(t("error_saving"), "error");
       }
     } catch (err) {
       console.error(err);
-      showToast("Terjadi kesalahan sistem.", "error");
+      showToast(t("system_error"), "error");
     } finally {
       setSubmitting(false);
     }
   };
 
   const handleDelete = async (id: number) => {
-    const confirmed = await showConfirm(
-      "Hapus Alat?",
-      "Tindakan ini akan menghapus alat dari inventaris secara permanen."
-    );
+    const confirmed = await showConfirm(t("delete_tool_title"), t("delete_tool_desc"));
     if (!confirmed) return;
-
     try {
       const res = await fetch(`/api/alat/${id}`, { method: "DELETE" });
       if (res.ok) {
-        showToast("Alat berhasil dihapus.", "success");
+        showToast(t("item_deleted"), "success");
         fetchData();
       } else {
-        showToast("Gagal menghapus: Alat mungkin sedang dipinjam.", "error");
+        showToast(t("error_delete_borrowed"), "error");
       }
     } catch (err) {
       console.error(err);
-      showToast("Terjadi kesalahan sistem saat menghapus.", "error");
+      showToast(t("system_error"), "error");
     }
   };
 
@@ -175,14 +185,14 @@ function AlatContent() {
         <div>
           <div className="flex items-center gap-3 mb-2">
             <div className="px-3 py-1 bg-indigo-600 text-white text-[10px] font-black rounded-full uppercase tracking-widest flex items-center gap-1.5 shadow-lg shadow-indigo-500/20">
-              <Box size={10} /> Inventory Control
+              <Box size={10} /> {t("inventory_control")}
             </div>
-            <span className="text-xs text-slate-400 font-bold flex items-center gap-1">
-              <History size={12} /> Live tracking enabled
+            <span className="text-xs text-(--text-secondary) font-bold flex items-center gap-1">
+              <History size={12} /> {t("live_tracking")}
             </span>
           </div>
-          <h1 className="text-5xl font-black text-indigo-950 tracking-tighter">Tools Management</h1>
-          <p className="text-slate-500 font-medium mt-2 max-w-xl text-lg">Kelola aset dan alat praktik dengan sistem inventaris yang presisi dan real-time.</p>
+          <h1 className="text-5xl font-black text-(--text-primary) tracking-tighter">{t("tools_management")}</h1>
+          <p className="text-(--text-secondary) font-medium mt-2 max-w-xl text-lg">{t("tools_management_desc")}</p>
         </div>
 
         <div className="flex items-center gap-3">
@@ -190,7 +200,7 @@ function AlatContent() {
             onClick={() => handleOpenModal()}
             className="h-16 px-8 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl shadow-xl shadow-indigo-500/30 font-black uppercase tracking-widest text-xs flex items-center gap-3 group transition-all active:scale-95"
           >
-            <Plus className="h-5 w-5 transition-transform group-hover:rotate-90" /> Tambah Alat Baru
+            <Plus className="h-5 w-5 transition-transform group-hover:rotate-90" /> {t("add_tool")}
           </Button>
         </div>
       </div>
@@ -198,43 +208,43 @@ function AlatContent() {
       {/* Stats Summary */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {[
-          { icon: Package, label: "Total Asset", value: alat.length, color: "indigo" },
-          { icon: LayoutGrid, label: "Categories", value: categories.length, color: "blue" },
-          { icon: Filter, label: "In Stock", value: alat.reduce((acc, curr) => acc + curr.stok, 0), color: "emerald" },
-          { icon: ArrowUpDown, label: "Filtered", value: filteredAlat.length, color: "slate" }
+          { icon: Package, label: t("total_assets"), value: alat.length, color: "indigo" },
+          { icon: LayoutGrid, label: t("categories"), value: categories.length, color: "blue" },
+          { icon: Filter, label: t("in_stock"), value: alat.reduce((acc, curr) => acc + curr.stok, 0), color: "emerald" },
+          { icon: ArrowUpDown, label: t("filtered"), value: filteredAlat.length, color: "slate" }
         ].map((stat, i) => (
-          <div key={i} className="bg-white p-6 rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/50 flex items-center gap-5 hover:border-indigo-100 transition-colors group">
-            <div className={`w-14 h-14 rounded-2xl bg-${stat.color}-50 text-${stat.color}-600 flex items-center justify-center group-hover:scale-110 transition-transform`}>
+          <div key={i} className="bg-(--card) p-6 rounded-3xl border border-(--border) shadow-xl flex items-center gap-5 hover:border-indigo-100 transition-colors group">
+            <div className={`w-14 h-14 rounded-2xl bg-${stat.color}-50 dark:bg-${stat.color}-900/20 text-${stat.color}-600 flex items-center justify-center group-hover:scale-110 transition-transform`}>
               <stat.icon size={24} />
             </div>
             <div>
-              <p className="text-3xl font-black text-slate-900 leading-none">{stat.value}</p>
-              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-1">{stat.label}</p>
+              <p className="text-3xl font-black text-(--text-primary) leading-none">{stat.value}</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-(--text-secondary) mt-1">{stat.label}</p>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Search & Filter */}
+      {/* Search */}
       <div className="relative group">
-        <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-600 transition-colors">
+        <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none text-(--text-secondary) group-focus-within:text-indigo-600 transition-colors">
           <Search size={22} />
         </div>
         <Input
-          placeholder="Cari alat berdasarkan nama, kategori, atau ID spesifik..."
-          className="h-20 pl-16 pr-8 rounded-[28px] border-none bg-white shadow-2xl shadow-slate-200/40 text-xl font-medium text-slate-700 placeholder:text-slate-300 focus-visible:ring-4 focus-visible:ring-indigo-500/10 transition-all antialiased"
+          placeholder={t("search_tools_placeholder")}
+          className="h-20 pl-16 pr-8 rounded-[28px] border-none bg-(--card) shadow-2xl text-xl font-medium text-(--text-primary) placeholder:text-(--text-secondary) focus-visible:ring-4 focus-visible:ring-indigo-500/10 transition-all antialiased"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
 
       {/* Main Table Content */}
-      <Card className="rounded-[40px] border-none bg-white shadow-2xl shadow-slate-200/60 overflow-hidden relative">
+      <Card className="rounded-[40px] border-none bg-(--card) shadow-2xl overflow-hidden relative">
         {loading && (
-          <div className="absolute inset-0 bg-white/60 backdrop-blur-md z-30 flex items-center justify-center">
+          <div className="absolute inset-0 bg-(--card)/60 backdrop-blur-md z-30 flex items-center justify-center">
             <div className="flex flex-col items-center gap-4">
               <RefreshCw className="h-12 w-12 text-indigo-600 animate-spin" />
-              <p className="text-slate-400 font-black uppercase tracking-[0.2em] text-[10px]">Synchronizing Systems</p>
+              <p className="text-(--text-secondary) font-black uppercase tracking-[0.2em] text-[10px]">{t("loading")}</p>
             </div>
           </div>
         )}
@@ -242,23 +252,23 @@ function AlatContent() {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-slate-50/50 border-b border-slate-100 italic">
-                <th className="py-8 px-10 text-[10px] font-black uppercase tracking-widest text-slate-400">Tool Identity</th>
-                <th className="py-8 px-10 text-[10px] font-black uppercase tracking-widest text-slate-400">Class Type</th>
-                <th className="py-8 px-10 text-[10px] font-black uppercase tracking-widest text-slate-400">Inventory Status</th>
-                <th className="py-8 px-10 text-[10px] font-black uppercase tracking-widest text-slate-400 text-right">Operations</th>
+              <tr className="bg-(--background) border-b border-(--border) italic">
+                <th className="py-8 px-10 text-[10px] font-black uppercase tracking-widest text-(--text-secondary)">{t("tool_name")}</th>
+                <th className="py-8 px-10 text-[10px] font-black uppercase tracking-widest text-(--text-secondary)">{t("category")}</th>
+                <th className="py-8 px-10 text-[10px] font-black uppercase tracking-widest text-(--text-secondary)">{t("stock_status")}</th>
+                <th className="py-8 px-10 text-[10px] font-black uppercase tracking-widest text-(--text-secondary) text-right">{t("actions")}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-(--border)">
               {filteredAlat.map((item) => (
                 <tr
                   key={item.id}
                   onClick={() => handleOpenDetail(item)}
-                  className="group hover:bg-slate-50/80 transition-all duration-300 cursor-pointer"
+                  className="group hover:bg-(--background) transition-all duration-300 cursor-pointer"
                 >
                   <td className="py-8 px-10">
                     <div className="flex items-center gap-6">
-                      <div className="w-16 h-16 rounded-[24px] bg-slate-100 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-inner overflow-hidden relative border border-slate-200">
+                      <div className="w-16 h-16 rounded-[24px] bg-(--background) flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-inner overflow-hidden relative border border-(--border)">
                         {item.gambar ? (
                           <img src={item.gambar} alt={item.nama_alat} className="w-full h-full object-cover" />
                         ) : (
@@ -267,9 +277,9 @@ function AlatContent() {
                         <span className="absolute bottom-1 right-2 text-[8px] font-black opacity-30">#{item.id}</span>
                       </div>
                       <div className="max-w-[200px]">
-                        <p className="font-black text-slate-900 text-lg leading-tight group-hover:text-indigo-600 transition-colors uppercase tracking-tight truncate">{item.nama_alat}</p>
-                        <p className="text-slate-400 text-[10px] font-bold mt-1 line-clamp-1 italic px-1 opacity-60">
-                          {item.deskripsi || "No description provided"}
+                        <p className="font-black text-(--text-primary) text-lg leading-tight group-hover:text-indigo-600 transition-colors uppercase tracking-tight truncate">{translateName(item.nama_alat)}</p>
+                        <p className="text-(--text-secondary) text-[10px] font-bold mt-1 line-clamp-1 italic px-1 opacity-60">
+                          {translateDesc(item.deskripsi, item.nama_alat) || t("no_description")}
                         </p>
                       </div>
                     </div>
@@ -277,18 +287,18 @@ function AlatContent() {
                   <td className="py-8 px-10">
                     <div className="flex items-center gap-3">
                       <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
-                      <span className="font-black text-slate-600 text-xs uppercase tracking-widest opacity-80">{item.nama_kategori}</span>
+                      <span className="font-black text-(--text-secondary) text-xs uppercase tracking-widest opacity-80">{translateCategory(item.nama_kategori)}</span>
                     </div>
                   </td>
                   <td className="py-8 px-10">
                     <div className="flex flex-col gap-2">
                       <div className="flex items-center justify-between max-w-[120px]">
                         <span className={`text-[10px] font-black uppercase tracking-widest ${item.stok > 0 ? 'text-emerald-500' : 'text-red-500'}`}>
-                          {item.stok > 0 ? 'In Operation' : 'Depleted'}
+                          {item.stok > 0 ? t("in_stock") : t("out_of_stock")}
                         </span>
-                        <span className="text-slate-900 font-bold text-sm tracking-tighter">{item.stok} Unit</span>
+                        <span className="text-(--text-primary) font-bold text-sm tracking-tighter">{item.stok}</span>
                       </div>
-                      <div className="w-[120px] h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                      <div className="w-[120px] h-1.5 bg-(--background) rounded-full overflow-hidden">
                         <div
                           className={`h-full rounded-full ${item.stok > 10 ? 'bg-indigo-500' : item.stok > 0 ? 'bg-amber-500' : 'bg-red-500'}`}
                           style={{ width: `${Math.min((item.stok / 50) * 100, 100)}%` }}
@@ -301,22 +311,16 @@ function AlatContent() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleOpenModal(item);
-                        }}
-                        className="h-12 w-12 rounded-2xl border border-slate-100 hover:bg-white hover:text-indigo-600 hover:shadow-lg transition-all"
+                        onClick={(e) => { e.stopPropagation(); handleOpenModal(item); }}
+                        className="h-12 w-12 rounded-2xl border border-(--border) hover:bg-(--background) hover:text-indigo-600 hover:shadow-lg transition-all"
                       >
                         <Edit2 size={18} />
                       </Button>
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDelete(item.id);
-                        }}
-                        className="h-12 w-12 rounded-2xl border border-slate-100 hover:bg-red-50 hover:text-red-600 hover:border-red-100 hover:shadow-lg transition-all text-slate-400"
+                        onClick={(e) => { e.stopPropagation(); handleDelete(item.id); }}
+                        className="h-12 w-12 rounded-2xl border border-(--border) hover:bg-red-50 hover:text-red-600 hover:border-red-100 hover:shadow-lg transition-all text-(--text-secondary)"
                       >
                         <Trash2 size={18} />
                       </Button>
@@ -328,12 +332,12 @@ function AlatContent() {
                 <tr>
                   <td colSpan={4} className="py-32 text-center">
                     <div className="flex flex-col items-center gap-4">
-                      <div className="w-20 h-20 rounded-[32px] bg-slate-50 flex items-center justify-center text-slate-200">
+                      <div className="w-20 h-20 rounded-[32px] bg-(--background) flex items-center justify-center text-(--text-secondary)">
                         <Search size={40} />
                       </div>
                       <div>
-                        <p className="text-slate-900 font-black text-2xl tracking-tight">No records discovered</p>
-                        <p className="text-slate-400 font-bold uppercase text-[10px] tracking-widest leading-none mt-1">Try adjusting your search sequence</p>
+                        <p className="text-(--text-primary) font-black text-2xl tracking-tight">{t("no_results")}</p>
+                        <p className="text-(--text-secondary) font-bold uppercase text-[10px] tracking-widest leading-none mt-1">{t("try_different_search")}</p>
                       </div>
                     </div>
                   </td>
@@ -347,23 +351,23 @@ function AlatContent() {
       {/* Add/Edit Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/40 backdrop-blur-xl animate-in fade-in duration-300">
-          <div className="w-full max-w-lg bg-white rounded-[48px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-500">
+          <div className="w-full max-w-lg bg-(--card) rounded-[48px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-500">
             <form onSubmit={handleSubmit}>
-              <div className="p-10 border-b border-slate-100 overflow-hidden relative">
+              <div className="p-10 border-b border-(--border) overflow-hidden relative">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full -translate-y-1/2 translate-x-1/2" />
-                <h3 className="text-3xl font-black text-slate-900 tracking-tighter">
-                  {formData.id ? "Edit Equipment" : "Registry New Tool"}
+                <h3 className="text-3xl font-black text-(--text-primary) tracking-tighter">
+                  {formData.id ? t("edit_tool") : t("add_tool")}
                 </h3>
-                <p className="text-slate-500 font-medium mt-1">Configure your inventory parameters below.</p>
+                <p className="text-(--text-secondary) font-medium mt-1">{t("configure_inventory")}</p>
               </div>
 
               <div className="p-10 space-y-8">
                 <div className="space-y-3">
-                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Tool Specification</label>
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-(--text-secondary) ml-1">{t("tool_name")}</label>
                   <Input
                     required
-                    placeholder="Enter tool nomenclature..."
-                    className="h-16 px-6 rounded-2xl border-slate-200 focus-visible:ring-indigo-600 font-bold text-lg"
+                    placeholder={t("tool_name_placeholder")}
+                    className="h-16 px-6 rounded-2xl border-(--border) focus-visible:ring-indigo-600 font-bold text-lg"
                     value={formData.nama_alat}
                     onChange={e => setFormData({ ...formData, nama_alat: e.target.value })}
                   />
@@ -371,26 +375,26 @@ function AlatContent() {
 
                 <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-3">
-                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Classification</label>
+                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-(--text-secondary) ml-1">{t("category")}</label>
                     <select
                       required
-                      className="w-full h-16 px-6 rounded-2xl border-2 border-slate-100 focus:border-indigo-600 focus:outline-none font-bold text-slate-700 transition-all appearance-none bg-slate-50"
+                      className="w-full h-16 px-6 rounded-2xl border-2 border-(--border) focus:border-indigo-600 focus:outline-none font-bold text-(--text-primary) transition-all appearance-none bg-(--background)"
                       value={formData.kategori_id}
                       onChange={e => setFormData({ ...formData, kategori_id: e.target.value })}
                     >
-                      <option value="">Select Category</option>
+                      <option value="">{t("select_category")}</option>
                       {categories.map(c => (
-                        <option key={c.id} value={c.id}>{c.nama_kategori}</option>
+                        <option key={c.id} value={c.id}>{translateCategory(c.nama_kategori)}</option>
                       ))}
                     </select>
                   </div>
                   <div className="space-y-3">
-                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Initial Unit</label>
+                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-(--text-secondary) ml-1">{t("initial_stock")}</label>
                     <Input
                       required
                       type="number"
                       min="0"
-                      className="h-16 px-6 rounded-2xl border-slate-200 focus-visible:ring-indigo-600 font-black text-lg"
+                      className="h-16 px-6 rounded-2xl border-(--border) focus-visible:ring-indigo-600 font-black text-lg"
                       value={formData.stok}
                       onChange={e => setFormData({ ...formData, stok: parseInt(e.target.value) || 0 })}
                     />
@@ -398,28 +402,28 @@ function AlatContent() {
                 </div>
 
                 <div className="space-y-3">
-                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Tool Narrative / Description</label>
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-(--text-secondary) ml-1">{t("description")}</label>
                   <textarea
-                    className="w-full p-6 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-indigo-600 focus:outline-none font-medium text-slate-600 transition-all min-h-[120px]"
-                    placeholder="Provide context about this equipment..."
+                    className="w-full p-6 bg-(--background) border-2 border-(--border) rounded-2xl focus:border-indigo-600 focus:outline-none font-medium text-(--text-primary) transition-all min-h-[120px]"
+                    placeholder={t("description_placeholder")}
                     value={formData.deskripsi}
                     onChange={e => setFormData({ ...formData, deskripsi: e.target.value })}
                   />
                 </div>
 
                 <div className="space-y-3">
-                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Visual Resource (URL)</label>
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-(--text-secondary) ml-1">{t("image_url")}</label>
                   <div className="flex gap-4">
                     <div className="flex-1">
                       <Input
                         placeholder="https://example.com/image.jpg"
-                        className="h-16 px-6 rounded-2xl border-slate-200 focus-visible:ring-indigo-600 font-bold"
+                        className="h-16 px-6 rounded-2xl border-(--border) focus-visible:ring-indigo-600 font-bold"
                         value={formData.gambar}
                         onChange={e => setFormData({ ...formData, gambar: e.target.value })}
                       />
                     </div>
                     {formData.gambar && (
-                      <div className="w-16 h-16 rounded-2xl border-2 border-slate-100 bg-slate-50 overflow-hidden shadow-inner">
+                      <div className="w-16 h-16 rounded-2xl border-2 border-(--border) bg-(--background) overflow-hidden shadow-inner">
                         <img src={formData.gambar} alt="Preview" className="w-full h-full object-cover" />
                       </div>
                     )}
@@ -432,29 +436,30 @@ function AlatContent() {
                   type="button"
                   variant="ghost"
                   onClick={() => setShowModal(false)}
-                  className="flex-1 h-16 rounded-2xl font-bold text-slate-500 hover:bg-slate-50"
+                  className="flex-1 h-16 rounded-2xl font-bold text-(--text-secondary) hover:bg-(--background)"
                   disabled={submitting}
                 >
-                  Cancel Operation
+                  {t("cancel")}
                 </Button>
                 <Button
                   disabled={submitting}
-                  className="flex-3 h-16 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-indigo-500/20 px-10"
+                  className="flex-1 h-16 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-indigo-500/20 px-10"
                 >
-                  {submitting ? <RefreshCw className="animate-spin" /> : formData.id ? "Commit Updates" : "Register Access"}
+                  {submitting ? <RefreshCw className="animate-spin" /> : formData.id ? t("save_changes") : t("add_tool")}
                 </Button>
               </div>
             </form>
           </div>
         </div>
       )}
+
       {/* Equipment Detail Modal */}
       <EquipmentDetailModal
         isOpen={showDetailModal}
         onClose={() => setShowDetailModal(false)}
         tool={selectedToolForDetail}
         modalMode="detail"
-        setModalMode={() => { }} // Not used in admin mode
+        setModalMode={() => { }}
         tanggalKembali=""
         setTanggalKembali={() => { }}
         handleBorrow={() => { }}

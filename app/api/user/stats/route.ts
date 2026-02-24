@@ -26,7 +26,8 @@ export async function GET() {
       SELECT 
         p.id, 
         a.nama_alat as item, 
-        TO_CHAR(p.tanggal_pinjam, 'DD Mon YYYY') as date, 
+        a.gambar, 
+        p.tanggal_pinjam as date, 
         p.status
       FROM peminjaman p
       JOIN alat a ON p.alat_id = a.id

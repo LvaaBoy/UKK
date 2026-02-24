@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-  ArrowRight,
   Wrench,
   Key,
   ShieldCheck,
@@ -37,7 +36,7 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        alert(data.error);
+        alert(data.error || t("login_failed"));
         return;
       }
 
@@ -54,14 +53,14 @@ export default function LoginPage() {
       }
     } catch (err) {
       console.error(err);
-      alert("Terjadi kesalahan saat login");
+      alert(t("system_error"));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex min-h-screen w-full bg-slate-50 relative overflow-hidden">
+    <div className="flex min-h-screen w-full bg-(--background) relative overflow-hidden transition-colors duration-300">
       {/* Background Decor */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-blue-400/20 rounded-full blur-[120px] animate-float" />
@@ -74,29 +73,29 @@ export default function LoginPage() {
 
           {/* Left: Login Form */}
           <div className="flex flex-col justify-center">
-            <Card className="border-white/50 shadow-2xl backdrop-blur-xl bg-white/80">
+            <Card className="border-(--border) shadow-2xl backdrop-blur-xl bg-white/80 dark:bg-(--card)/80">
               <CardHeader className="pb-8">
                 <div className="flex items-center gap-2 mb-6 text-blue-600">
-                  <div className="p-2 bg-blue-100 rounded-lg">
+                  <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
                     <Wrench className="h-6 w-6" />
                   </div>
-                  <span className="font-bold text-xl tracking-tight text-slate-800">UKK Inventory</span>
+                  <span className="font-bold text-xl tracking-tight text-(--text-primary)">UKK Inventory</span>
                 </div>
-                <CardTitle className="text-3xl font-bold text-slate-800">Welcome Back</CardTitle>
-                <CardDescription className="text-slate-500 text-base mt-2">
-                  Enter your credentials to access the management system.
+                <CardTitle className="text-3xl font-bold text-(--text-primary)">{t("login_welcome")}</CardTitle>
+                <CardDescription className="text-(--text-secondary) text-base mt-2">
+                  {t("login_subtitle")}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={login} className="space-y-6">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-700 ml-1">Username</label>
+                    <label className="text-sm font-medium text-(--text-secondary) ml-1">{t("username")}</label>
                     <div className="relative group">
-                      <User size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+                      <User size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-(--text-secondary) group-focus-within:text-blue-500 transition-colors" />
                       <Input
                         required
-                        className="pl-10 bg-white"
-                        placeholder="Enter your username"
+                        className="pl-10 bg-(--background)"
+                        placeholder={t("username_placeholder")}
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                       />
@@ -105,17 +104,17 @@ export default function LoginPage() {
 
                   <div className="space-y-2">
                     <div className="flex justify-between items-center ml-1">
-                      <label className="text-sm font-medium text-slate-700">Password</label>
+                      <label className="text-sm font-medium text-(--text-secondary)">{t("password")}</label>
                       <Link href="#" className="text-xs font-semibold text-blue-600 hover:text-blue-700 hover:underline">
-                        Forgot password?
+                        {t("forgot_password")}
                       </Link>
                     </div>
                     <div className="relative group">
-                      <Key size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+                      <Key size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-(--text-secondary) group-focus-within:text-blue-500 transition-colors" />
                       <Input
                         required
                         type="password"
-                        className="pl-10 bg-white"
+                        className="pl-10 bg-(--background)"
                         placeholder="••••••••"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
@@ -128,15 +127,15 @@ export default function LoginPage() {
                     type="submit"
                     className="w-full h-12 text-base shadow-blue-500/25 shadow-lg hover:shadow-blue-500/40 transition-all"
                   >
-                    {loading ? <Loader2 className="animate-spin mr-2" size={20} /> : "Sign In to Dashboard"}
+                    {loading ? <Loader2 className="animate-spin mr-2" size={20} /> : t("sign_in")}
                   </Button>
                 </form>
               </CardContent>
-              <CardFooter className="justify-center border-t border-slate-100 pt-6">
-                <p className="text-slate-500 text-sm">
-                  Don't have an account?{" "}
+              <CardFooter className="justify-center border-t border-(--border) pt-6">
+                <p className="text-(--text-secondary) text-sm">
+                  {t("no_account")}{" "}
                   <Link href="/register" className="text-blue-600 font-bold hover:underline">
-                    Register here
+                    {t("register_now")}
                   </Link>
                 </p>
               </CardFooter>
@@ -146,69 +145,69 @@ export default function LoginPage() {
           {/* Right: Feature Showcase (Hidden on mobile) */}
           <div className="hidden lg:flex flex-col justify-center relative">
             <div className="absolute inset-0 bg-blue-600/5 rounded-3xl backdrop-blur-sm transform rotate-3 scale-95 z-0" />
-            <div className="glass-card bg-white/40 p-10 border border-white/60 relative z-10 flex flex-col justify-between h-[600px] overflow-hidden group">
+            <div className="glass-card bg-white/40 dark:bg-(--card)/40 p-10 border border-white/60 dark:border-(--border) relative z-10 flex flex-col justify-between h-[600px] overflow-hidden group rounded-3xl">
 
               {/* Decor Circles */}
               <div className="absolute -top-20 -right-20 w-64 h-64 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full blur-3xl opacity-20 group-hover:opacity-30 transition-opacity duration-700" />
 
               <div className="space-y-6">
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/60 rounded-full text-xs font-bold text-blue-700 border border-white/50 backdrop-blur-md">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/60 dark:bg-white/10 rounded-full text-xs font-bold text-blue-700 dark:text-blue-400 border border-white/50 dark:border-white/10 backdrop-blur-md">
                   <Sparkles size={14} className="fill-blue-400 text-blue-400" />
                   New Feature
                 </div>
-                <h3 className="text-4xl font-extrabold text-slate-800 leading-tight">
-                  Manage your <br />
+                <h3 className="text-4xl font-extrabold text-(--text-primary) leading-tight">
+                  {t("manage_assets_title").split("Inventory Assets")[0]} <br />
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-pink-500">
                     Inventory Assets
                   </span>
-                  <br /> with ease.
+                  <br /> {t("manage_assets_title").split("Inventory Assets")[1]}
                 </h3>
-                <p className="text-slate-600 text-lg leading-relaxed max-w-sm">
-                  Track borrowings, manage stock, and generate reports in real-time with our new streamlined dashboard.
+                <p className="text-(--text-secondary) text-lg leading-relaxed max-w-sm">
+                  {t("manage_assets_desc")}
                 </p>
               </div>
 
               <div className="relative mt-8">
                 {/* Mock UI Element */}
-                <div className="bg-white/90 rounded-2xl p-4 shadow-xl border border-blue-100 transform rotate-[-2deg] opacity-90 group-hover:rotate-0 group-hover:scale-105 transition-all duration-500">
+                <div className="bg-white/90 dark:bg-(--card)/90 rounded-2xl p-4 shadow-xl border border-blue-100 dark:border-blue-900/30 transform rotate-[-2deg] opacity-90 group-hover:rotate-0 group-hover:scale-105 transition-all duration-500">
                   <div className="flex items-center gap-3 mb-3">
-                    <div className="h-8 w-8 bg-green-100 rounded-full flex items-center justify-center">
+                    <div className="h-8 w-8 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center">
                       <ShieldCheck className="w-4 h-4 text-green-600" />
                     </div>
                     <div>
-                      <p className="font-bold text-slate-800 text-sm">Item Returned</p>
-                      <p className="text-xs text-slate-400">Just now</p>
+                      <p className="font-bold text-(--text-primary) text-sm">{t("item_returned")}</p>
+                      <p className="text-xs text-(--text-secondary)">Just now</p>
                     </div>
                   </div>
-                  <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                  <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                     <div className="h-full w-3/4 bg-green-500 rounded-full" />
                   </div>
                 </div>
 
-                <div className="bg-white/90 rounded-2xl p-4 shadow-xl border border-pink-100 transform translate-y-[-10px] translate-x-[20px] rotate-[3deg] group-hover:translate-x-[10px] group-hover:rotate-[5deg] transition-all duration-500 delay-75">
+                <div className="bg-white/90 dark:bg-(--card)/90 rounded-2xl p-4 shadow-xl border border-pink-100 dark:border-pink-900/30 transform translate-y-[-10px] translate-x-[20px] rotate-[3deg] group-hover:translate-x-[10px] group-hover:rotate-[5deg] transition-all duration-500 delay-75">
                   <div className="flex items-center gap-3 mb-3">
-                    <div className="h-8 w-8 bg-pink-100 rounded-full flex items-center justify-center">
+                    <div className="h-8 w-8 bg-pink-100 dark:bg-pink-900/20 rounded-full flex items-center justify-center">
                       <User className="w-4 h-4 text-pink-600" />
                     </div>
                     <div>
-                      <p className="font-bold text-slate-800 text-sm">New Request</p>
-                      <p className="text-xs text-slate-400">2 mins ago</p>
+                      <p className="font-bold text-(--text-primary) text-sm">{t("new_request")}</p>
+                      <p className="text-xs text-(--text-secondary)">2 mins ago</p>
                     </div>
                   </div>
                   <div className="flex gap-2">
                     <div className="h-6 w-16 bg-pink-500 rounded-md" />
-                    <div className="h-6 w-6 bg-slate-200 rounded-md" />
+                    <div className="h-6 w-6 bg-slate-200 dark:bg-slate-700 rounded-md" />
                   </div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 text-sm text-slate-500 font-medium">
+              <div className="flex items-center gap-2 text-sm text-(--text-secondary) font-medium">
                 <div className="flex -space-x-2">
                   {[1, 2, 3].map(i => (
-                    <div key={i} className={`w-8 h-8 rounded-full border-2 border-white bg-slate-200 bg-[url('https://i.pravatar.cc/100?img=${i + 10}')] bg-cover`} />
+                    <div key={i} className={`w-8 h-8 rounded-full border-2 border-white dark:border-(--border) bg-slate-200 bg-[url('https://i.pravatar.cc/100?img=${i + 10}')] bg-cover`} />
                   ))}
                 </div>
-                <span>used by 500+ students</span>
+                <span>{t("user_stats")}</span>
               </div>
             </div>
           </div>
@@ -218,4 +217,3 @@ export default function LoginPage() {
     </div>
   );
 }
-

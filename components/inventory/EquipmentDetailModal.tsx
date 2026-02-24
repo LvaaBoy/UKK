@@ -3,6 +3,7 @@
 import React from "react";
 import { X, Send, ArrowLeft, Calendar, Clock, Package, Loader2 } from "lucide-react";
 import { useTheme } from "@/app/context/ThemeContext";
+import { useTranslation } from "@/app/context/LanguageContext";
 
 interface EquipmentDetailModalProps {
     isOpen: boolean;
@@ -37,6 +38,28 @@ export function EquipmentDetailModal({
     isAdmin = false
 }: EquipmentDetailModalProps) {
     const { theme } = useTheme();
+    const { t } = useTranslation();
+
+    const translateName = (name: string) => {
+        if (!name) return "";
+        const key = `tool_name_${name.toLowerCase().replace(/\s+/g, '_')}` as any;
+        const translated = t(key);
+        return translated === key ? name : translated;
+    };
+
+    const translateDesc = (desc: string, name: string) => {
+        if (!name) return desc;
+        const key = `tool_desc_${name.toLowerCase().replace(/\s+/g, '_')}` as any;
+        const translated = t(key);
+        return translated === key ? desc : translated;
+    };
+
+    const translateCategory = (name: string) => {
+        if (!name) return "";
+        const key = `category_${name.toLowerCase().replace(/\s+/g, '_')}` as any;
+        const translated = t(key);
+        return translated === key ? name : translated;
+    };
 
     if (!isOpen || !tool) return null;
 
@@ -47,7 +70,7 @@ export function EquipmentDetailModal({
                 onClick={onClose}
             />
             <div className={`rounded-3xl md:rounded-[52px] w-full max-w-4xl max-h-[90vh] md:h-[600px] overflow-hidden relative shadow-2xl animate-in zoom-in-95 duration-500 border flex flex-col lg:flex-row
-                ${theme === 'dark' ? 'bg-brand-card border-white/5 text-white' : 'bg-white border-slate-100 text-slate-800'}`}>
+                ${theme === 'dark' ? 'bg-(--card) border-white/5 text-white' : 'bg-white border-slate-100 text-slate-800'}`}>
 
                 <button
                     onClick={onClose}
@@ -72,13 +95,13 @@ export function EquipmentDetailModal({
                     <div className="absolute inset-0 bg-linear-to-t from-slate-950 via-slate-950/20 to-transparent" />
                     <div className="absolute bottom-8 left-8 right-8 z-10">
                         <span className="text-[10px] font-black uppercase tracking-[0.3em] px-3 py-1.5 bg-brand-green text-black rounded-lg inline-block mb-4 shadow-lg shadow-emerald-500/20">
-                            {tool.nama_kategori}
+                            {translateCategory(tool.nama_kategori)}
                         </span>
-                        <h2 className="text-2xl md:text-4xl font-black text-white leading-tight tracking-tight">{tool.nama_alat}</h2>
+                        <h2 className="text-2xl md:text-4xl font-black text-white leading-tight tracking-tight">{translateName(tool.nama_alat)}</h2>
                         <div className="flex items-center gap-4 mt-4 opacity-60">
                             <div className="flex items-center gap-1.5">
                                 <span className="w-1.5 h-1.5 rounded-full bg-brand-green" />
-                                <span className="text-[10px] font-bold text-white uppercase tracking-widest">In Stock: {tool.stok}</span>
+                                <span className="text-[10px] font-bold text-white uppercase tracking-widest">{t("stock")}: {tool.stok}</span>
                             </div>
                             <div className="flex items-center gap-1.5">
                                 <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
@@ -93,26 +116,30 @@ export function EquipmentDetailModal({
                     {modalMode === 'detail' ? (
                         <div className="space-y-8 md:space-y-10 animate-in slide-in-from-right-8 duration-500">
                             <div className="space-y-5">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] block">Technical Narrative</label>
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] block">{t("technical_narrative")}</label>
                                 <div className="space-y-4">
                                     <p className="text-slate-400 font-medium leading-relaxed text-sm md:text-base antialiased">
-                                        {tool.deskripsi || "Alat laboratorium berkualitas tinggi yang telah diverifikasi kelayakannya oleh tim teknis kami untuk menjamin hasil kerja yang presisi dan standar keamanan maksimal."}
+                                        {translateDesc(tool.deskripsi, tool.nama_alat) || t("default_tool_desc")}
                                     </p>
                                     <div className="pt-2 flex flex-wrap gap-2">
-                                        <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-white/5 text-[10px] font-black text-slate-400 uppercase tracking-widest border border-slate-200/50 dark:border-white/5">Verified Condition</span>
-                                        <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-white/5 text-[10px] font-black text-slate-400 uppercase tracking-widest border border-slate-200/50 dark:border-white/5">Lab Secondary Asset</span>
+                                        <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-white/5 text-[10px] font-black text-slate-400 uppercase tracking-widest border border-slate-200/50 dark:border-white/5">{t("verified_condition")}</span>
+                                        <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-white/5 text-[10px] font-black text-slate-400 uppercase tracking-widest border border-slate-200/50 dark:border-white/5">{t("lab_secondary_asset")}</span>
                                     </div>
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
-                                <div className="p-4 md:p-5 rounded-2xl md:rounded-3xl bg-slate-50 border border-slate-100 dark:bg-white/5 dark:border-white/5 group hover:bg-brand-green/5 hover:border-brand-green/20 transition-all duration-300">
-                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">Availability</p>
-                                    <p className={`text-xl md:text-2xl font-black tracking-tighter ${tool.stok > 0 ? 'text-brand-green' : 'text-rose-500'}`}>{tool.stok} <span className="text-xs font-bold uppercase tracking-widest text-slate-400 ml-1">Units</span></p>
+                                <div className="p-4 md:p-5 rounded-2xl md:rounded-3xl bg-(--background)/50 border border-(--border) dark:border-white/5 group hover:bg-brand-green/5 hover:border-brand-green/20 transition-all duration-300">
+                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">{t("availability")}</p>
+                                    <p className={`text-xl md:text-2xl font-black tracking-tighter ${tool.stok > 0 ? 'text-brand-green' : 'text-rose-500'}`}>
+                                        {tool.stok} <span className="text-xs font-bold uppercase tracking-widest text-slate-400 ml-1">{t("units")}</span>
+                                    </p>
                                 </div>
-                                <div className="p-4 md:p-5 rounded-2xl md:rounded-3xl bg-slate-50 border border-slate-100 dark:bg-white/5 dark:border-white/5 group hover:bg-indigo-500/5 hover:border-indigo-500/20 transition-all duration-300">
-                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">Status</p>
-                                    <p className="text-xl md:text-2xl font-black text-indigo-500 tracking-tighter">Ready <span className="text-xs font-bold uppercase tracking-widest text-slate-400 ml-1">To Use</span></p>
+                                <div className="p-4 md:p-5 rounded-2xl md:rounded-3xl bg-(--background)/50 border border-(--border) dark:border-white/5 group hover:bg-indigo-500/5 hover:border-indigo-500/20 transition-all duration-300">
+                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">{t("status")}</p>
+                                    <p className="text-xl md:text-2xl font-black text-indigo-500 tracking-tighter">
+                                        {t("ready_to_use")} <span className="text-xs font-bold uppercase tracking-widest text-slate-400 ml-1">{t("to_use")}</span>
+                                    </p>
                                 </div>
                             </div>
 
@@ -125,8 +152,8 @@ export function EquipmentDetailModal({
                                             ${tool.stok > 0 ? 'bg-brand-green text-black shadow-emerald-500/30' : 'bg-slate-100 text-slate-400 cursor-not-allowed'}`}
                                     >
                                         {tool.stok > 0 ? (
-                                            <>Lanjutkan Peminjaman <Send size={20} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" /></>
-                                        ) : "Stok Tidak Tersedia"}
+                                            <>{t("proceed_borrow")} <Send size={20} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" /></>
+                                        ) : t("out_of_stock")}
                                     </button>
                                 </div>
                             )}
@@ -137,18 +164,18 @@ export function EquipmentDetailModal({
                                 onClick={() => setModalMode('detail')}
                                 className="inline-flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-brand-green transition-colors w-fit group"
                             >
-                                <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> Back to Equipment Specs
+                                <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> {t("back_to_specs")}
                             </button>
 
                             <div className="space-y-8 flex-1">
                                 <div className="space-y-2">
-                                    <h3 className="text-2xl md:text-3xl font-black tracking-tight">Plan Your Usage</h3>
-                                    <p className="text-slate-400 text-sm font-medium leading-relaxed">Tentukan durasi penggunaan alat untuk memastikan ketersediaan bagi pengguna lain.</p>
+                                    <h3 className="text-2xl md:text-3xl font-black tracking-tight">{t("plan_usage")}</h3>
+                                    <p className="text-slate-400 text-sm font-medium leading-relaxed">{t("plan_usage_desc")}</p>
                                 </div>
 
                                 <form onSubmit={handleBorrow} className="space-y-6 md:space-y-8">
                                     <div className="space-y-4">
-                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] ml-1">Pengembalian Terjadwal</label>
+                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] ml-1">{t("scheduled_return")}</label>
                                         <div className="relative group/input">
                                             <Calendar size={22} className="absolute left-6 top-1/2 -translate-y-1/2 text-brand-green group-focus-within/input:scale-110 transition-transform" />
                                             <input
@@ -156,7 +183,7 @@ export function EquipmentDetailModal({
                                                 type="date"
                                                 min={new Date().toISOString().split('T')[0]}
                                                 className={`w-full pl-16 pr-8 py-5 md:py-6 border-none rounded-[20px] md:rounded-[24px] focus:ring-8 focus:ring-brand-green/10 transition-all font-black text-base md:text-lg 
-                                                    ${theme === 'dark' ? 'bg-white/5 text-white' : 'bg-slate-50 text-slate-800'}`}
+                                                    ${theme === 'dark' ? 'bg-(--background) text-white' : 'bg-slate-50 text-slate-800'}`}
                                                 value={tanggalKembali}
                                                 onChange={(e) => setTanggalKembali(e.target.value)}
                                             />
@@ -168,7 +195,7 @@ export function EquipmentDetailModal({
                                             <Clock className="text-amber-600" size={20} />
                                         </div>
                                         <p className="text-[11px] font-medium text-slate-500/80 leading-relaxed">
-                                            Proses peminjaman memerlukan verifikasi manual oleh petugas lab. Anda akan menerima notifikasi status dalam waktu maksimal 24 jam.
+                                            {t("borrow_notice")}
                                         </p>
                                     </div>
 
@@ -181,7 +208,7 @@ export function EquipmentDetailModal({
                                         {submitting ? (
                                             <Loader2 className="animate-spin text-black" size={32} />
                                         ) : (
-                                            <>Kirim Pengajuan <Send size={24} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" /></>
+                                            <>{t("submit_request")} <Send size={24} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" /></>
                                         )}
                                     </button>
                                 </form>

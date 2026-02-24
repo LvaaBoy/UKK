@@ -56,28 +56,23 @@ export default function PetugasDashboard() {
 
   const updateStatus = async (id: string, action: 'approve' | 'reject' | 'return') => {
     const rawId = id.replace("#", "");
-    let endpoint = "";
-
     try {
       let url = "";
       if (action === 'return') {
         url = `/api/petugas/peminjaman/${rawId}/return`;
       } else {
-        endpoint = action; // approve or reject
-        url = `/api/peminjaman/${rawId}/${endpoint}`;
+        url = `/api/peminjaman/${rawId}/${action}`;
       }
-
       const res = await fetch(url, { method: "PUT" });
-
       if (res.ok) {
         fetchData();
       } else {
         const error = await res.json();
-        alert(error.error || `Gagal memproses aksi: ${action}`);
+        alert(error.error || t("system_error"));
       }
     } catch (err) {
       console.error(err);
-      alert("Terjadi kesalahan sistem");
+      alert(t("system_error"));
     }
   };
 
@@ -91,11 +86,11 @@ export default function PetugasDashboard() {
 
   if (!data || data.error) {
     return (
-      <div className="p-8 text-center bg-white rounded-3xl mx-auto max-w-lg mt-10 shadow-xl shadow-blue-500/10">
+      <div className="p-8 text-center bg-(--card) rounded-3xl mx-auto max-w-lg mt-10 shadow-xl shadow-blue-500/10 border border-(--border)">
         <AlertTriangle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-        <h2 className="text-2xl font-black text-blue-900 mb-2">Error Loading Dashboard</h2>
-        <p className="text-slate-500 mb-6">{data?.error || "Unknown Error"}</p>
-        <Button onClick={() => window.location.reload()}>Try Again</Button>
+        <h2 className="text-2xl font-black text-(--text-primary) mb-2">{t("error_loading_dashboard")}</h2>
+        <p className="text-(--text-secondary) mb-6">{data?.error || t("error")}</p>
+        <Button onClick={() => window.location.reload()}>{t("try_again")}</Button>
       </div>
     );
   }
@@ -105,55 +100,40 @@ export default function PetugasDashboard() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-black text-blue-900 tracking-tight">Petugas Dashboard</h1>
-          <p className="text-slate-500 font-medium">Manage daily logistics and verified returns.</p>
+          <h1 className="text-3xl font-black text-(--text-primary) tracking-tight">{t("dashboard")}</h1>
+          <p className="text-(--text-secondary) font-medium">{t("petugas_desc")}</p>
         </div>
         <Button variant="outline" className="self-start">
           <PackageCheck className="mr-2 h-4 w-4 text-emerald-500" />
-          Quick Scan
+          {t("quick_scan")}
         </Button>
       </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <PetugasStat
-          title="Incoming Requests"
-          value={data.stats.pendingRequests}
-          icon={<Clock size={20} />}
-          color="blue"
-        />
-        <PetugasStat
-          title="Active Loans"
-          value={data.stats.activeLoans}
-          icon={<CheckCircle2 size={20} />}
-          color="green"
-        />
-        <PetugasStat
-          title="Tools Out"
-          value={data.stats.toolsOut}
-          icon={<ClipboardList size={20} />}
-          color="pink"
-        />
+        <PetugasStat title={t("pending_requests")} value={data.stats.pendingRequests} icon={<Clock size={20} />} color="blue" />
+        <PetugasStat title={t("active_loans")} value={data.stats.activeLoans} icon={<CheckCircle2 size={20} />} color="green" />
+        <PetugasStat title={t("tools_out")} value={data.stats.toolsOut} icon={<ClipboardList size={20} />} color="pink" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Task List (Incoming & Returns) */}
+        {/* Task List */}
         <div className="lg:col-span-2 space-y-6">
-          <h3 className="font-bold text-xl text-blue-900 flex items-center gap-2">
-            Needs Attention
+          <h3 className="font-bold text-xl text-(--text-primary) flex items-center gap-2">
+            {t("needs_attention")}
             <Badge variant="warning">{data.incomingRequests.length}</Badge>
           </h3>
 
-          <div className="bg-white rounded-[32px] border border-slate-100 shadow-xl shadow-blue-500/5 p-2">
+          <div className="bg-(--card) rounded-[32px] border border-(--border) shadow-xl shadow-blue-500/5 p-2">
             {data.incomingRequests.length === 0 ? (
               <div className="py-20 text-center space-y-3">
-                <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto text-blue-400 opacity-50"><CheckCircle2 size={32} /></div>
-                <p className="text-slate-400 font-bold">All caught up!</p>
+                <div className="w-16 h-16 bg-blue-50 dark:bg-blue-900/20 rounded-full flex items-center justify-center mx-auto text-blue-400 opacity-50"><CheckCircle2 size={32} /></div>
+                <p className="text-(--text-secondary) font-bold">{t("all_caught_up")}</p>
               </div>
             ) : (
               <div className="space-y-1">
                 {data.incomingRequests.map((row) => (
-                  <div key={row.id} className="group p-5 hover:bg-slate-50 rounded-[24px] transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div key={row.id} className="group p-5 hover:bg-(--background) rounded-[24px] transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
                       <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black border transition-colors
                                       ${row.status === 'PENDING_KEMBALI'
@@ -163,19 +143,19 @@ export default function PetugasDashboard() {
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <p className="font-bold text-blue-900">{row.user}</p>
+                          <p className="font-bold text-(--text-primary)">{row.user}</p>
                           <Badge variant={row.status === 'PENDING_KEMBALI' ? 'warning' : 'secondary'} className="text-[10px] px-2 h-5">
-                            {row.status === 'PENDING_KEMBALI' ? 'RETURNING' : 'BORROWING'}
+                            {row.status === 'PENDING_KEMBALI' ? t("returning") : t("borrowing")}
                           </Badge>
                         </div>
-                        <p className="text-xs text-slate-500 font-medium">Item: <span className="text-slate-700 font-bold">{row.item}</span></p>
+                        <p className="text-xs text-(--text-secondary) font-medium">{t("item")}: <span className="text-(--text-primary) font-bold">{row.item}</span></p>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-2 self-end sm:self-auto">
                       {row.status === 'PENDING_KEMBALI' ? (
                         <Button onClick={() => updateStatus(row.id, 'return')} size="sm" className="bg-emerald-500 hover:bg-emerald-600 border-none text-white shadow-emerald-500/20">
-                          <CheckCircle2 size={16} className="mr-2" /> Confirm Return
+                          <CheckCircle2 size={16} className="mr-2" /> {t("confirm_return")}
                         </Button>
                       ) : (
                         <>
@@ -195,51 +175,45 @@ export default function PetugasDashboard() {
           </div>
         </div>
 
-        {/* Activity Tracking & History */}
+        {/* Activity & History */}
         <div className="space-y-6">
-          <h3 className="font-bold text-xl text-blue-900">Activity & Flow</h3>
-          <Card className="border-slate-100 bg-white shadow-xl shadow-blue-500/5">
+          <h3 className="font-bold text-xl text-(--text-primary)">{t("activity_flow")}</h3>
+          <Card className="border-(--border) bg-(--card) shadow-xl shadow-blue-500/5">
             <div className="h-44 w-full p-4">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={data.charts.activity}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
                   <XAxis dataKey="day" hide />
                   <Tooltip />
-                  <Line
-                    type="monotone"
-                    dataKey="count"
-                    stroke="#3b82f6"
-                    strokeWidth={4}
+                  <Line type="monotone" dataKey="count" stroke="#3b82f6" strokeWidth={4}
                     dot={{ fill: '#3b82f6', strokeWidth: 0, r: 4 }}
-                    activeDot={{ r: 6, strokeWidth: 2, stroke: '#fff' }}
-                  />
+                    activeDot={{ r: 6, strokeWidth: 2, stroke: '#fff' }} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
 
             <div className="p-6 pt-0 space-y-4">
-              <h4 className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Recent Approved</h4>
+              <h4 className="text-[10px] font-black text-(--text-secondary) uppercase tracking-widest">{t("recent_approved")}</h4>
               {data.activeTracking.map((item) => (
                 <div key={item.id} className="flex justify-between items-center text-sm">
-                  <span className="font-bold text-slate-700">{item.user}</span>
-                  <span className="text-slate-400 text-xs">{item.date}</span>
+                  <span className="font-bold text-(--text-primary)">{item.user}</span>
+                  <span className="text-(--text-secondary) text-xs">{item.date}</span>
                 </div>
               ))}
             </div>
           </Card>
 
-          {/* Return History Section */}
-          <h3 className="font-bold text-xl text-blue-900 pt-2">Return History</h3>
-          <Card className="border-slate-100 bg-white shadow-xl shadow-blue-500/5">
+          <h3 className="font-bold text-xl text-(--text-primary) pt-2">{t("return_history")}</h3>
+          <Card className="border-(--border) bg-(--card) shadow-xl shadow-blue-500/5">
             <div className="p-6 space-y-4">
               {(data as any).returnedHistory?.length === 0 ? (
-                <p className="text-center text-slate-400 text-sm py-4">No returns yet.</p>
+                <p className="text-center text-(--text-secondary) text-sm py-4">{t("no_returns_yet")}</p>
               ) : (
                 (data as any).returnedHistory?.map((item: any) => (
-                  <div key={item.id} className="flex justify-between items-center text-sm border-b border-slate-50 pb-3 last:border-0 last:pb-0">
+                  <div key={item.id} className="flex justify-between items-center text-sm border-b border-(--border) pb-3 last:border-0 last:pb-0">
                     <div>
-                      <p className="font-bold text-slate-700">{item.user}</p>
-                      <p className="text-[10px] text-slate-400">{item.item}</p>
+                      <p className="font-bold text-(--text-primary)">{item.user}</p>
+                      <p className="text-[10px] text-(--text-secondary)">{item.item}</p>
                     </div>
                     <span className="text-emerald-500 font-bold text-xs">{item.date}</span>
                   </div>
@@ -260,20 +234,20 @@ function PetugasStat({ title, value, icon, color }: {
   color: string;
 }) {
   const colorStyles = {
-    blue: "bg-blue-50 text-blue-500",
-    green: "bg-emerald-50 text-emerald-500",
-    pink: "bg-pink-50 text-pink-500",
+    blue: "bg-blue-50 dark:bg-blue-900/20 text-blue-500",
+    green: "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500",
+    pink: "bg-pink-50 dark:bg-pink-900/20 text-pink-500",
   };
 
   return (
-    <Card className="border-slate-100 hover:shadow-lg transition-all">
+    <Card className="border-(--border) bg-(--card) hover:shadow-lg transition-all">
       <CardContent className="p-6 flex items-center gap-4">
         <div className={`p-4 rounded-2xl ${colorStyles[color as keyof typeof colorStyles]}`}>
           {icon}
         </div>
         <div>
-          <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">{title}</p>
-          <h4 className="text-3xl font-black text-slate-800">{value}</h4>
+          <p className="text-[10px] font-black text-(--text-secondary) uppercase tracking-widest mb-1">{title}</p>
+          <h4 className="text-3xl font-black text-(--text-primary)">{value}</h4>
         </div>
       </CardContent>
     </Card>

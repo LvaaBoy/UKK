@@ -1,7 +1,9 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
-  /* Brand Colors - Premium Gradient Base */
+  /* Brand Colors */
   --color-brand-blue: #3b82f6;
   --color-brand-purple: #8b5cf6;
   --color-brand-pink: #ec4899;
@@ -10,9 +12,7 @@
 
   /* Aurora Accents */
   --color-aurora-1: #e0f2fe;
-  /* Light Blue */
   --color-aurora-2: #fbcfe8;
-  /* Light Pink */
 
   /* Semantic */
   --color-success: #10b981;
@@ -20,42 +20,80 @@
   --color-danger: #ef4444;
 }
 
+/* ========== LIGHT MODE (default) ========== */
 :root {
-  /* Core Backgrounds */
   --background: #f8fafc;
-  /* Slate-50 */
   --foreground: #0f172a;
-  /* Slate-900 */
+  --surface: #ffffff;
+  --surface-secondary: #f1f5f9;
+  --border: rgba(0, 0, 0, 0.08);
 
-  /* Glass UI Cards */
   --glass-bg: rgba(255, 255, 255, 0.7);
   --glass-border: rgba(255, 255, 255, 0.5);
   --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
 
-  /* Text Colors */
   --text-primary: #0f172a;
   --text-secondary: #64748b;
   --text-muted: #94a3b8;
+
+  --sidebar-bg: rgba(255, 255, 255, 0.85);
+  --sidebar-border: rgba(255, 255, 255, 0.4);
+  --sidebar-item-active: #eff6ff;
+  --sidebar-item-active-text: #2563eb;
+  --sidebar-item-hover: #f8fafc;
+  --sidebar-text: #475569;
+
+  --aurora-a: #e0f2fe;
+  --aurora-b: #fbcfe8;
+}
+
+/* ========== DARK MODE ========== */
+.dark {
+  --background: #020617;
+  --foreground: #f8fafc;
+  --surface: #0b1120;
+  --surface-secondary: #0f172a;
+  --card: #1e293b;
+  --border: rgba(255, 255, 255, 0.08);
+
+  --glass-bg: rgba(17, 24, 39, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
+
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+
+  --sidebar-bg: rgba(2, 6, 23, 0.98);
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-item-active: rgba(59, 130, 246, 0.25);
+  --sidebar-item-active-text: #60a5fa;
+  --sidebar-item-hover: rgba(255, 255, 255, 0.06);
+  --sidebar-text: #94a3b8;
+
+  --aurora-a: rgba(30, 58, 138, 0.4);
+  --aurora-b: rgba(134, 25, 143, 0.3);
+}
+
+/* ========== BASE ========== */
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background:
-    radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%),
-    radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 1) 0, transparent 50%),
-    radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 1) 0, transparent 50%);
-  background-color: #f8fafc;
-  /* Fallback */
+  background-color: var(--background);
   background-image:
-    radial-gradient(at 0% 0%, var(--color-aurora-1) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, var(--color-aurora-2) 0px, transparent 50%);
+    radial-gradient(at 0% 0%, var(--aurora-a) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, var(--aurora-b) 0px, transparent 50%);
   background-attachment: fixed;
-  color: var(--foreground);
+  color: var(--text-primary);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Glassmorphism Utilities */
+/* ========== Glassmorphism ========== */
 .glass-panel {
   background: var(--glass-bg);
   backdrop-filter: blur(12px);
@@ -69,31 +107,65 @@ body {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--glass-border);
-  box-shadow: var(--glass-shadow);
+  box-shadow:
+    var(--glass-shadow),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.05);
   @apply rounded-2xl transition-all duration-300;
 }
 
 .glass-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.15);
-  border-color: rgba(255, 255, 255, 0.8);
 }
 
-/* Animations */
+/* ========== Animations ========== */
 @keyframes float {
-  0% {
+
+  0%,
+  100% {
     transform: translateY(0px);
   }
 
   50% {
     transform: translateY(-10px);
   }
+}
 
-  100% {
-    transform: translateY(0px);
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
 .animate-float {
   animation: float 6s ease-in-out infinite;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.5s ease-out forwards;
+}
+
+/* ========== Scrollbar ========== */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--text-muted);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
 }
