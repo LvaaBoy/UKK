@@ -24,3 +24,4 @@ export async function GET() {
         return apiError("Failed to fetch audit logs", error.message, 500);
     }
 }
+        

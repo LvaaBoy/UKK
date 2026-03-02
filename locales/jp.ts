@@ -338,6 +338,48 @@ const jp = {
     account_security: "アカウントセキュリティ",
     update_credentials: "資格情報を更新",
     logout_session: "ログアウトセッション",
+
+    // ── Admin Peminjaman CRUD ─────────────────────
+    peminjaman_menu: "貸出データ",
+    peminjaman_management: "貸出管理",
+    peminjaman_management_desc: "すべての貸出トランザクションを完全に管理します。",
+    add_peminjaman: "貸出を追加",
+    edit_peminjaman: "貸出を編集",
+    peminjaman_added: "貸出が正常に追加されました！",
+    peminjaman_updated: "貸出が正常に更新されました！",
+    peminjaman_deleted: "貸出が正常に削除されました！",
+    delete_peminjaman_title: "貸出を削除しますか？",
+    delete_peminjaman_desc: "この操作は、この貸出レコードを永久に削除します。",
+    all: "すべて",
+    all_status: "すべてのステータス",
+    select_user: "ユーザーを選択",
+    select_item: "ツールを選択",
+
+    // ── Admin Pengembalian CRUD ───────────────────
+    pengembalian_menu: "返却データ",
+    pengembalian_management: "返却管理",
+    pengembalian_management_desc: "返却記録と罰金を管理します。",
+    add_pengembalian: "返却を追加",
+    edit_pengembalian: "返却を編集",
+    pengembalian_added: "返却が正常に記録されました！",
+    pengembalian_updated: "返却が正常に更新されました！",
+    pengembalian_deleted: "返却記録が削除されました！",
+    delete_pengembalian_title: "返却記録を削除しますか？",
+    delete_pengembalian_desc: "これにより、貸出ステータスが「承認済み」に戻ります。",
+    total_pengembalian: "総返却数",
+    total_denda: "総罰金",
+    fine: "罰金",
+    return_date_actual: "実際の返却日",
+    fine_calc_note: "自動計算: Rp 5,000/日の遅延。手動で上書きできます。",
+    select_loan: "アクティブな貸出を選択",
+    no_active_loans: "利用可能なアクティブな貸出はありません。",
+
+    // ── Petugas Laporan ───────────────────────────
+    petugas_laporan: "レポートを印刷",
+    staff_report_title: "担当者レポート",
+    staff_report_desc: "貸出と返却活動の包括的なレポート。",
+    print_report: "レポートを印刷",
+    records: "件",
 };
 
 export default jp;

@@ -338,6 +338,48 @@ const id = {
     account_security: "Keamanan Akun",
     update_credentials: "Perbarui Kredensial",
     logout_session: "Keluar Sesi",
+
+    // ── Admin Peminjaman CRUD ─────────────────────
+    peminjaman_menu: "Data Peminjaman",
+    peminjaman_management: "Manajemen Peminjaman",
+    peminjaman_management_desc: "Kontrol penuh atas semua transaksi peminjaman alat.",
+    add_peminjaman: "Tambah Peminjaman",
+    edit_peminjaman: "Edit Peminjaman",
+    peminjaman_added: "Peminjaman berhasil ditambahkan!",
+    peminjaman_updated: "Peminjaman berhasil diperbarui!",
+    peminjaman_deleted: "Peminjaman berhasil dihapus!",
+    delete_peminjaman_title: "Hapus Peminjaman?",
+    delete_peminjaman_desc: "Tindakan ini akan menghapus catatan peminjaman secara permanen.",
+    all: "Semua",
+    all_status: "Semua Status",
+    select_user: "Pilih Pengguna",
+    select_item: "Pilih Alat",
+
+    // ── Admin Pengembalian CRUD ───────────────────
+    pengembalian_menu: "Data Pengembalian",
+    pengembalian_management: "Manajemen Pengembalian",
+    pengembalian_management_desc: "Kelola catatan pengembalian alat dan denda.",
+    add_pengembalian: "Tambah Pengembalian",
+    edit_pengembalian: "Edit Pengembalian",
+    pengembalian_added: "Pengembalian berhasil dicatat!",
+    pengembalian_updated: "Pengembalian berhasil diperbarui!",
+    pengembalian_deleted: "Catatan pengembalian berhasil dihapus!",
+    delete_pengembalian_title: "Hapus Data Pengembalian?",
+    delete_pengembalian_desc: "Status peminjaman akan dikembalikan menjadi 'Disetujui'.",
+    total_pengembalian: "Total Pengembalian",
+    total_denda: "Total Denda",
+    fine: "Denda",
+    return_date_actual: "Tanggal Kembali Aktual",
+    fine_calc_note: "Dihitung otomatis: Rp 5.000/hari keterlambatan. Bisa diubah manual.",
+    select_loan: "Pilih Peminjaman Aktif",
+    no_active_loans: "Tidak ada peminjaman aktif yang bisa diproses.",
+
+    // ── Petugas Laporan ───────────────────────────
+    petugas_laporan: "Cetak Laporan",
+    staff_report_title: "Laporan Petugas",
+    staff_report_desc: "Laporan lengkap aktivitas peminjaman dan pengembalian alat.",
+    print_report: "Cetak Laporan",
+    records: "data",
 };
 
 export default id;

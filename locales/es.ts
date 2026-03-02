@@ -338,6 +338,48 @@ const es = {
     account_security: "Seguridad de la Cuenta",
     update_credentials: "Actualizar Credenciales",
     logout_session: "Cerrar Sesión",
+
+    // ── Admin Peminjaman CRUD ─────────────────────
+    peminjaman_menu: "Datos de Préstamo",
+    peminjaman_management: "Gestión de Préstamos",
+    peminjaman_management_desc: "Control total sobre todas las transacciones de préstamo.",
+    add_peminjaman: "Añadir Préstamo",
+    edit_peminjaman: "Editar Préstamo",
+    peminjaman_added: "¡Préstamo añadido con éxito!",
+    peminjaman_updated: "¡Préstamo actualizado con éxito!",
+    peminjaman_deleted: "¡Préstamo eliminado con éxito!",
+    delete_peminjaman_title: "¿Eliminar Préstamo?",
+    delete_peminjaman_desc: "Esto eliminará permanentemente este registro de préstamo.",
+    all: "Todos",
+    all_status: "Todos los Estados",
+    select_user: "Seleccionar Usuario",
+    select_item: "Seleccionar Herramienta",
+
+    // ── Admin Pengembalian CRUD ───────────────────
+    pengembalian_menu: "Datos de Devolución",
+    pengembalian_management: "Gestión de Devoluciones",
+    pengembalian_management_desc: "Gestionar registros de devolución y multas.",
+    add_pengembalian: "Añadir Devolución",
+    edit_pengembalian: "Editar Devolución",
+    pengembalian_added: "¡Devolución registrada con éxito!",
+    pengembalian_updated: "¡Devolución actualizada con éxito!",
+    pengembalian_deleted: "¡Registro de devolución eliminado!",
+    delete_pengembalian_title: "¿Eliminar Registro de Devolución?",
+    delete_pengembalian_desc: "Esto revertirá el estado del préstamo a 'Aprobado'.",
+    total_pengembalian: "Total de Devoluciones",
+    total_denda: "Total de Multas",
+    fine: "Multa",
+    return_date_actual: "Fecha de Devolución Real",
+    fine_calc_note: "Auto-calculado: Rp 5.000/día de retraso. Puede anular manualmente.",
+    select_loan: "Seleccionar Préstamo Activo",
+    no_active_loans: "No hay préstamos activos disponibles.",
+
+    // ── Petugas Laporan ───────────────────────────
+    petugas_laporan: "Imprimir Informe",
+    staff_report_title: "Informe de Personal",
+    staff_report_desc: "Informe completo de actividades de préstamo y devolución.",
+    print_report: "Imprimir Informe",
+    records: "registros",
 };
 
 export default es;

@@ -338,6 +338,48 @@ const fr = {
     account_security: "Sécurité du Compte",
     update_credentials: "Mettre à jour les Identifiants",
     logout_session: "Fermer la Session",
+
+    // ── Admin Peminjaman CRUD ─────────────────────
+    peminjaman_menu: "Données d'Emprunt",
+    peminjaman_management: "Gestion des Emprunts",
+    peminjaman_management_desc: "Contrôle total sur toutes les transactions d'emprunt.",
+    add_peminjaman: "Ajouter un Emprunt",
+    edit_peminjaman: "Modifier l'Emprunt",
+    peminjaman_added: "Emprunt ajouté avec succès !",
+    peminjaman_updated: "Emprunt mis à jour avec succès !",
+    peminjaman_deleted: "Emprunt supprimé avec succès !",
+    delete_peminjaman_title: "Supprimer l'Emprunt ?",
+    delete_peminjaman_desc: "Cela supprimera définitivement cet enregistrement d'emprunt.",
+    all: "Tous",
+    all_status: "Tous les Statuts",
+    select_user: "Sélectionner un Utilisateur",
+    select_item: "Sélectionner un Outil",
+
+    // ── Admin Pengembalian CRUD ───────────────────
+    pengembalian_menu: "Données de Retour",
+    pengembalian_management: "Gestion des Retours",
+    pengembalian_management_desc: "Gérer les enregistrements de retour et les amendes.",
+    add_pengembalian: "Ajouter un Retour",
+    edit_pengembalian: "Modifier le Retour",
+    pengembalian_added: "Retour enregistré avec succès !",
+    pengembalian_updated: "Retour mis à jour avec succès !",
+    pengembalian_deleted: "Enregistrement de retour supprimé !",
+    delete_pengembalian_title: "Supprimer l'Enregistrement de Retour ?",
+    delete_pengembalian_desc: "Cela rétablira le statut du prêt à 'Approuvé'.",
+    total_pengembalian: "Total des Retours",
+    total_denda: "Total des Amendes",
+    fine: "Amende",
+    return_date_actual: "Date de Retour Réelle",
+    fine_calc_note: "Calculé automatiquement: Rp 5.000/jour de retard. Peut être modifié manuellement.",
+    select_loan: "Sélectionner un Emprunt Actif",
+    no_active_loans: "Aucun emprunt actif disponible.",
+
+    // ── Petugas Laporan ───────────────────────────
+    petugas_laporan: "Imprimer le Rapport",
+    staff_report_title: "Rapport du Personnel",
+    staff_report_desc: "Rapport complet des activités d'emprunt et de retour.",
+    print_report: "Imprimer le Rapport",
+    records: "enregistrements",
 };
 
 export default fr;

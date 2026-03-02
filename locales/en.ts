@@ -338,6 +338,48 @@ const en = {
     account_security: "Account Security",
     update_credentials: "Update Credentials",
     logout_session: "Logout Session",
+
+    // ── Admin Peminjaman CRUD ─────────────────────
+    peminjaman_menu: "Loan Data",
+    peminjaman_management: "Loan Management",
+    peminjaman_management_desc: "Full control over all borrowing transactions.",
+    add_peminjaman: "Add Loan",
+    edit_peminjaman: "Edit Loan",
+    peminjaman_added: "Loan added successfully!",
+    peminjaman_updated: "Loan updated successfully!",
+    peminjaman_deleted: "Loan deleted successfully!",
+    delete_peminjaman_title: "Delete Loan?",
+    delete_peminjaman_desc: "This will permanently remove this loan record.",
+    all: "All",
+    all_status: "All Status",
+    select_user: "Select User",
+    select_item: "Select Tool",
+
+    // ── Admin Pengembalian CRUD ───────────────────
+    pengembalian_menu: "Return Data",
+    pengembalian_management: "Return Management",
+    pengembalian_management_desc: "Manage equipment return records and fines.",
+    add_pengembalian: "Add Return",
+    edit_pengembalian: "Edit Return",
+    pengembalian_added: "Return recorded successfully!",
+    pengembalian_updated: "Return updated successfully!",
+    pengembalian_deleted: "Return record deleted!",
+    delete_pengembalian_title: "Delete Return Record?",
+    delete_pengembalian_desc: "This will revert the loan status to 'Approved'.",
+    total_pengembalian: "Total Returns",
+    total_denda: "Total Fines",
+    fine: "Fine",
+    return_date_actual: "Actual Return Date",
+    fine_calc_note: "Auto-calculated: Rp 5,000/day late. You may override manually.",
+    select_loan: "Select Active Loan",
+    no_active_loans: "No active loans available to process.",
+
+    // ── Petugas Laporan ───────────────────────────
+    petugas_laporan: "Print Report",
+    staff_report_title: "Staff Report",
+    staff_report_desc: "Comprehensive report of borrowing and return activities.",
+    print_report: "Print Report",
+    records: "records",
 };
 
 export default en;

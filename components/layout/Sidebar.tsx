@@ -17,6 +17,9 @@ import {
     Moon,
     ChevronDown,
     Globe,
+    ArrowRightLeft,
+    RotateCcw,
+    Printer,
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useTheme } from "@/app/context/ThemeContext";
@@ -60,9 +63,12 @@ export function Sidebar({ onLogout, className, role = "user" }: SidebarProps) {
         { labelKey: "products" as const, icon: Package, path: "/dashboard/alat", roles: ["peminjam", "user"] },
         { labelKey: "categories" as const, icon: ClipboardList, path: "/admin/kategori", roles: ["admin", "petugas"] },
         { labelKey: "loans" as const, icon: ClipboardList, path: "/dashboard/peminjaman", roles: ["peminjam", "user"] },
+        { labelKey: "peminjaman_menu" as any, icon: ArrowRightLeft, path: "/admin/peminjaman", roles: ["admin"] },
+        { labelKey: "pengembalian_menu" as any, icon: RotateCcw, path: "/admin/pengembalian", roles: ["admin"] },
         { labelKey: "users" as const, icon: Users, path: "/admin/users", roles: ["admin"] },
         { labelKey: "reports" as const, icon: FileText, path: "/admin/laporan", roles: ["admin"] },
         { labelKey: "stats" as const, icon: Shield, path: "/admin/audit-logs", roles: ["admin"] },
+        { labelKey: "petugas_laporan" as any, icon: Printer, path: "/petugas/laporan", roles: ["petugas"] },
     ];
 
     const filteredItems = menuItems.filter(item => item.roles.includes(role));
